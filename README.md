@@ -5,7 +5,7 @@ an "archive" for models, where specified attributes are copied over to another t
 
 > [!CAUTION]
 > This package is currently in its early stages of development and should not be used in production applications.
-> Package wide refactors may happen at any time, introducing breaking changes.
+> Package wide refactors may happen at any time, introducing breaking changes. 
 
 ## Overview
 This package allows you to capture the state of Eloquent models and their related models at a specific point in time. 

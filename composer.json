@@ -1,0 +1,57 @@
+{
+    "name": "dvarilek/laravel-snapshot-tree",
+    "description": "A Laravel package for capturing and persisting the state of Eloquent models along with their relationships.",
+    "keywords": [
+        "laravel",
+        "model",
+        "eloquent",
+        "relationship"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dvarilek\\LaravelSnapshotTree\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dvarilek\\LaravelSnapshotTree\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "David Vařílek",
+            "email": "davan@outlook.cz"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/database": "^v10.38.0",
+        "illuminate/support": "^v10.38.0",
+        "illuminate/contracts": "^v10.38.0",
+        "spatie/laravel-package-tools": "^1.18"
+
+    },
+    "require-dev": {
+        "illuminate/console": "^v10.38.0",
+        "pestphp/pest": "^2.36",
+        "orchestra/testbench": "^8.31"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dvarilek\\LaravelSnapshotTree\\LaravelSnapshotTreeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "platform": {
+            "php": "8.2"
+        },
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
