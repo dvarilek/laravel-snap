@@ -2,7 +2,7 @@
 
 namespace Dvarilek\LaravelSnapshotTree\ValueObjects;
 
-final class SnapshotDefinition
+class SnapshotDefinition
 {
 
     /**
@@ -18,11 +18,11 @@ final class SnapshotDefinition
     protected bool $shouldCaptureAllAttributes = false;
 
     /**
-     * @var list<SnapshotDefinition>
+     * @var list<RelationDefinition>
      */
     protected array $relations = [];
 
-    public static function make(): self
+    public static function make(): static
     {
         return new self();
     }
@@ -33,7 +33,7 @@ final class SnapshotDefinition
      * @param  list<string> $attributes
      * @return $this
      */
-    public function capture(array $attributes): self
+    public function capture(array $attributes): static
     {
         $this->attributes = $attributes;
 
@@ -46,7 +46,7 @@ final class SnapshotDefinition
      * @param  list<string> $attributes
      * @return $this
      */
-    public function exclude(array $attributes): self
+    public function exclude(array $attributes): static
     {
         $this->excludedAttributes = $attributes;
 
@@ -56,10 +56,10 @@ final class SnapshotDefinition
     /**
      * Define a snapshot of attributes on a related model.
      *
-     * @param  list<SnapshotDefinition> $relations
-     * @return self
+     * @param  list<RelationDefinition> $relations
+     * @return static
      */
-    public function captureRelations(array $relations): self
+    public function captureRelations(array $relations): static
     {
         $this->relations = $relations;
 
@@ -71,7 +71,7 @@ final class SnapshotDefinition
      *
      * @return $this
      */
-    public function captureAll(): self
+    public function captureAll(): static
     {
         $this->shouldCaptureAllAttributes = true;
 
@@ -95,7 +95,7 @@ final class SnapshotDefinition
     }
 
     /**
-     * @return list<SnapshotDefinition>
+     * @return list<RelationDefinition>
      */
     public function getRelations(): array
     {
