@@ -17,6 +17,8 @@ class SnapshotDefinition
 
     protected bool $shouldCaptureAllAttributes = false;
 
+    protected bool $shouldCaptureHiddenAttributes = false;
+
     /**
      * @var list<RelationDefinition>
      */
@@ -69,11 +71,27 @@ class SnapshotDefinition
     /**
      * Capture all model attributes.
      *
+     * @param  bool $shouldCaptureHiddenAttributes
      * @return $this
      */
-    public function captureAll(): static
+    public function captureAll(bool $shouldCaptureHiddenAttributes = false): static
     {
         $this->shouldCaptureAllAttributes = true;
+
+        $this->shouldCaptureHiddenAttributes = $shouldCaptureHiddenAttributes;
+
+        return $this;
+    }
+
+    /**
+     * Determine if hidden attributes should be captured.
+     *
+     * @param  bool $shouldCaptureAllAttributes
+     * @return $this
+     */
+    public function captureHiddenAttributes(bool $shouldCaptureAllAttributes = true): static
+    {
+        $this->shouldCaptureHiddenAttributes = $shouldCaptureAllAttributes;
 
         return $this;
     }
@@ -105,5 +123,10 @@ class SnapshotDefinition
     public function shouldCaptureAllAttributes(): bool
     {
         return $this->shouldCaptureAllAttributes;
+    }
+
+    public function shouldCaptureHiddenAttributes(): bool
+    {
+        return $this->shouldCaptureHiddenAttributes;
     }
 }
