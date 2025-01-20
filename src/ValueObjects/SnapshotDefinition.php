@@ -15,6 +15,8 @@ class SnapshotDefinition
      */
     protected array $excludedAttributes = [];
 
+    protected ?string $primaryKey = 'primary_key';
+
     protected bool $shouldCaptureAllAttributes = false;
 
     protected bool $shouldCaptureHiddenAttributes = false;
@@ -69,6 +71,19 @@ class SnapshotDefinition
     }
 
     /**
+     * Specify the primary key alias for snapshot.
+     *
+     * @param  string|null $primaryKey
+     * @return $this
+     */
+    public function setPrimaryKey(?string $primaryKey): static
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+
+    /**
      * Capture all model attributes.
      *
      * @param  bool $shouldCaptureHiddenAttributes
@@ -118,6 +133,11 @@ class SnapshotDefinition
     public function getRelations(): array
     {
         return $this->relations;
+    }
+
+    public function getPrimaryKey(): ?string
+    {
+        return $this->primaryKey;
     }
 
     public function shouldCaptureAllAttributes(): bool
