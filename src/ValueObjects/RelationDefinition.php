@@ -9,9 +9,9 @@ class RelationDefinition extends SnapshotDefinition
         protected ?string $name = null
     ) {}
 
-    public static function make(?string $name = null): static
+    public static function from(string $relationName): static
     {
-        return new static($name);
+        return new static($relationName);
     }
 
     public function name(string $name): static
