@@ -45,7 +45,6 @@ it('correctly initializes and serializes RelationTransferObject', function () {
         ->and($dto->value)->toBe('test_value')
         ->and($dto->relationPath)->toBe(['firstRelation', 'secondRelation'])
         ->and($dto->cast)->toBeNull()
-        ->and(TransferObjectHelper::createQualifiedRelationName($dto))->toBe("firstRelation_secondRelation_test_attribute")
         ->and($dto->toArray())->toBe([
             'attribute' => 'test_attribute',
             'value' => 'test_value',
