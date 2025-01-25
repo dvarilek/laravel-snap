@@ -2,12 +2,19 @@
 
 namespace Dvarilek\LaravelSnapshotTree;
 
+use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\LaravelSnapshotTree\Services\SnapshotAttributeCollector;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelPackageTools\Package;
 
 class LaravelSnapshotTreeServiceProvider extends PackageServiceProvider
 {
+
+    public function bootingPackage(): void
+    {
+        $this->app->bind(AttributeCollectorInterface::class, SnapshotAttributeCollector::class);
+    }
 
     public function configurePackage(Package $package): void
     {
