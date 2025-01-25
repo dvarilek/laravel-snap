@@ -1,30 +1,62 @@
 <?php
 
-use Dvarilek\LaravelSnapshotTree\DTO\RelationTransferObject;
+use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 use Illuminate\Contracts\Support\Arrayable;
+use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
 
-it('correctly initializes and serializes RelationTransferObject', function () {
-    $dto = new RelationTransferObject(
+it('correctly initializes and serializes AttributeTransferObject', function () {
+    $dto = new AttributeTransferObject(
         attribute: 'test_attribute',
         value: 'test_value',
-        relationPath: 'test_relation'
+        cast: 'boolean',
     );
 
-    expect($dto)->toBeInstanceOf(Arrayable::class)
+    expect($dto)
+        ->toBeInstanceOf(Arrayable::class)
         ->toBeInstanceOf(JsonSerializable::class)
         ->and($dto->attribute)->toBe('test_attribute')
         ->and($dto->value)->toBe('test_value')
-        ->and($dto->relationPath)->toBe('test_relation')
-        ->and($dto->getQualifiedRelationName())->toBe('test_relation_test_attribute')
+        ->and($dto->cast)->toBe('boolean')
         ->and($dto->toArray())->toBe([
             'attribute' => 'test_attribute',
             'value' => 'test_value',
-            'relationPath' => 'test_relation',
+            'cast' => 'boolean',
         ])
         ->and(json_encode($dto))->toBe(json_encode([
             'attribute' => 'test_attribute',
             'value' => 'test_value',
-            'relationPath' => 'test_relation',
+            'cast' => 'boolean',
         ]));
-
 });
+
+it('correctly initializes and serializes RelationTransferObject', function () {
+    $dto = new RelatedAttributeTransferObject(
+        attribute: 'test_attribute',
+        value: 'test_value',
+        cast: null,
+        relationPath: ['firstRelation', 'secondRelation']
+    );
+
+    expect($dto)
+        ->toBeInstanceOf(Arrayable::class)
+        ->toBeInstanceOf(JsonSerializable::class)
+        ->and($dto->attribute)->toBe('test_attribute')
+        ->and($dto->value)->toBe('test_value')
+        ->and($dto->relationPath)->toBe(['firstRelation', 'secondRelation'])
+        ->and($dto->cast)->toBeNull()
+        ->and(TransferObjectHelper::createQualifiedRelationName($dto))->toBe("firstRelation_secondRelation_test_attribute")
+        ->and($dto->toArray())->toBe([
+            'attribute' => 'test_attribute',
+            'value' => 'test_value',
+            'cast' => null,
+            'relationPath' => ['firstRelation', 'secondRelation'],
+        ])
+        ->and(json_encode($dto))->toBe(json_encode([
+            'attribute' => 'test_attribute',
+            'value' => 'test_value',
+            'cast' => null,
+            'relationPath' => ['firstRelation', 'secondRelation'],
+        ]));
+});
+
