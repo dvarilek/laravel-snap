@@ -2,9 +2,9 @@
 
 namespace Dvarilek\LaravelSnapshotTree\DTO;
 
-use Illuminate\Contracts\Support\Arrayable;
+use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
 
-final readonly class AttributeTransferObject implements \JsonSerializable, Arrayable
+final readonly class AttributeTransferObject implements VirtualAttributeInterface
 {
     public function __construct(
         public string $attribute,
