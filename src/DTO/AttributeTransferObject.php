@@ -8,7 +8,7 @@ final readonly class AttributeTransferObject implements VirtualAttributeInterfac
 {
     public function __construct(
         public string $attribute,
-        public ?string $value,
+        public mixed $value,
         public ?string $cast
     ) {}
 

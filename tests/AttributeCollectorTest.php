@@ -516,7 +516,7 @@ it('can collect attributes from model, related model and extra attributes', func
         ])
         ->and($attributes['test_root_model_id'])->toBeInstanceOf(AttributeTransferObject::class)
         ->attribute->toBe('test_root_model_id')
-        ->value->toBe("1")
+        ->value->toBe(1)
         ->cast->toBeNull()
         ->and($attributes['attribute1'])->toBeInstanceOf(AttributeTransferObject::class)
         ->attribute->toBe('attribute1')
@@ -578,7 +578,7 @@ it('can exlcude casts from being captured', function () {
         ->toHaveKey('castable1')
         ->and($attributes['castable1'])->toBeInstanceOf(AttributeTransferObject::class)
         ->attribute->toBe('castable1')
-        ->value->toBe($value1)
+        ->value->value->toBe($value1)
         ->cast->toBeNull();
 });
 
@@ -615,7 +615,7 @@ it('can capture casts from model and related model', function () {
         ])
         ->and($attributes['castable1'])->toBeInstanceOf(AttributeTransferObject::class)
         ->attribute->toBe('castable1')
-        ->value->toBe($childValue)
+        ->value->value->toBe($childValue)
         ->cast->toBe(AsStringable::class)
         ->and($attributes['parent_castable1'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('castable1')
