@@ -17,6 +17,8 @@ class SnapshotDefinition
 
     protected ?string $primaryKeyPrefix = null;
 
+    protected bool $shouldCaptureCasts = true;
+
     protected bool $shouldCaptureAllAttributes = false;
 
     protected bool $shouldCaptureHiddenAttributes = false;
@@ -87,6 +89,13 @@ class SnapshotDefinition
         return $this;
     }
 
+    public function captureCasts(bool $shouldCaptureCasts = true): static
+    {
+        $this->shouldCaptureCasts = $shouldCaptureCasts;
+
+        return $this;
+    }
+
     /**
      * Capture all model attributes.
      *
@@ -142,6 +151,11 @@ class SnapshotDefinition
     public function getPrimaryKeyPrefix(): ?string
     {
         return $this->primaryKeyPrefix;
+    }
+
+    public function shouldCaptureCasts(): bool
+    {
+        return $this->shouldCaptureCasts;
     }
 
     public function shouldCaptureAllAttributes(): bool

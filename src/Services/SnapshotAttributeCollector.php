@@ -19,8 +19,10 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
      */
     public function collectAttributes(Model $model, SnapshotDefinition $definition, array $extraAttributes = []): array
     {
+        $modelAttributes = $this->getModelAttributes($model, $definition);
+
         return [
-            ...$this->mapToTransferObjects($this->getModelAttributes($model, $definition), $model, $definition),
+            ...$this->mapToTransferObjects($modelAttributes, $model, $definition),
             ...$this->prepareExtraAttributes($extraAttributes),
             ...$this->getRelatedAttributes($model, $definition),
         ];
@@ -105,7 +107,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
                 $transferObject = new RelatedAttributeTransferObject(
                     attribute: $attribute,
                     value: $value,
-                    cast: null, // TODO: Add cast from definition
+                    cast: $this->getCast($attribute, $relatedModel, $relationDefinition),
                     relationPath: $currentPath
                 );
 
@@ -156,6 +158,22 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
                 )
             );
         }
+    }
+
+    /**
+     * @param  string $attribute
+     * @param  Model $model
+     * @param  SnapshotDefinition $definition
+     *
+     * @return string|null
+     */
+    protected function getCast(string $attribute, Model $model, SnapshotDefinition $definition): ?string
+    {
+        if (!$definition->shouldCaptureCasts()) {
+            return null;
+        }
+
+        return $model->getCasts()[$attribute] ?? null;
     }
 
     /**
@@ -211,11 +229,12 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
 
     /**
      * @param  array<string, mixed> $attributes
-     * @param  null|SnapshotDefinition $definition
+     * @param  SnapshotDefinition $definition
+     * @param  Model $model
      *
      * @return array<string, AttributeTransferObject>
      */
-    protected function mapToTransferObjects(array $attributes, ?SnapshotDefinition $definition = null): array
+    protected function mapToTransferObjects(array $attributes, Model $model, SnapshotDefinition $definition): array
     {
         $transferObjects = [];
 
@@ -223,7 +242,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             $transferObjects[$attribute] = new AttributeTransferObject(
                 attribute: $attribute,
                 value: $value,
-                cast: null // TODO: add casts
+                cast: $this->getCast($attribute, $model, $definition)
             );
         }
 

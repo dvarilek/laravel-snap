@@ -5,7 +5,6 @@ namespace Dvarilek\LaravelSnapshotTree\Tests\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TestParent1Model extends Model
 {
@@ -16,7 +15,12 @@ class TestParent1Model extends Model
         'attribute1',
         'attribute2',
         'attribute3',
+        'castable1',
         'parent_model_id'
+    ];
+
+    protected $casts = [
+        'castable1' => 'integer',
     ];
 
     public function parent(): BelongsTo

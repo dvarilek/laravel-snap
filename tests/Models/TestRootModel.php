@@ -4,6 +4,7 @@ namespace Dvarilek\LaravelSnapshotTree\Tests\Models;
 
 use Dvarilek\LaravelSnapshotTree\Models\Concerns\Snapshotable;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\SnapshotDefinition;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,6 +18,7 @@ class TestRootModel extends Model
         'attribute1',
         'attribute2',
         'attribute3',
+        'castable1',
         'extraAttribute1',
         'extraAttribute2',
         'parent_model_id',
@@ -25,6 +27,10 @@ class TestRootModel extends Model
 
     protected $hidden = [
         'hidden1'
+    ];
+
+    protected $casts = [
+        'castable1' => AsStringable::class,
     ];
 
     public static function getSnapshotDefinition(): SnapshotDefinition

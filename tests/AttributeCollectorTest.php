@@ -476,6 +476,7 @@ it('can collect attributes from model, related model and extra attributes', func
         ->captureAll()
         ->exclude([
             'created_at',
+            'castable1',
             'updated_at',
         ])
         ->captureRelations([
@@ -483,6 +484,7 @@ it('can collect attributes from model, related model and extra attributes', func
                 ->captureAll()
                 ->exclude([
                     'created_at',
+                    'castable1',
                     'updated_at',
                 ])
         ]);
@@ -556,3 +558,67 @@ it('can collect attributes from model, related model and extra attributes', func
         ->cast->toBeNull();
 });
 
+it('can exlcude casts from being captured', function () {
+    $collector = app(AttributeCollectorInterface::class);
+
+    $value1 = Str::random(10);
+
+    $model = TestRootModel::query()->create([
+        'castable1' => $value1,
+    ]);
+
+    $definition = SnapshotDefinition::make()
+        ->captureCasts(false)
+        ->capture(['castable1']);
+
+    $attributes = $collector->collectAttributes($model, $definition);
+
+    expect($attributes)
+        ->toHaveCount(1)
+        ->toHaveKey('castable1')
+        ->and($attributes['castable1'])->toBeInstanceOf(AttributeTransferObject::class)
+        ->attribute->toBe('castable1')
+        ->value->toBe($value1)
+        ->cast->toBeNull();
+});
+
+it('can capture casts from model and related model', function () {
+    $collector = app(AttributeCollectorInterface::class);
+
+    $relatedValue = 44454545;
+    $childValue = Str::random(10);
+
+    $parentModel = TestParent1Model::query()->create([
+        'castable1' => $relatedValue,
+    ]);
+
+    $childModel = $parentModel->children()->create([
+        'castable1' => $childValue,
+    ]);
+
+    $definition = SnapshotDefinition::make()
+        ->captureCasts()
+        ->capture(['castable1'])
+        ->captureRelations([
+            RelationDefinition::from('parent')
+                ->captureCasts()
+                ->capture(['castable1'])
+        ]);
+
+    $attributes = $collector->collectAttributes($childModel, $definition);
+
+    expect($attributes)
+        ->toHaveCount(2)
+        ->toHaveKeys([
+            'castable1',
+            'parent_castable1'
+        ])
+        ->and($attributes['castable1'])->toBeInstanceOf(AttributeTransferObject::class)
+        ->attribute->toBe('castable1')
+        ->value->toBe($childValue)
+        ->cast->toBe(AsStringable::class)
+        ->and($attributes['parent_castable1'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('castable1')
+        ->value->toBe($relatedValue)
+        ->cast->toBe('integer');
+});

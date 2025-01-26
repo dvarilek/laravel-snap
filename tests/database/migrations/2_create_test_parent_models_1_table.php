@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('attribute1')->nullable()->default(null);
             $table->string('attribute2')->nullable()->default(null);
             $table->string('attribute3')->nullable()->default(null);
+            $table->string('castable1')->nullable()->default(null);
             $table->foreignIdFor(TestParent2Model::class, 'parent_model_id')->nullable()->default(null);
             $table->timestamps();
         });
