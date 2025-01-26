@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('model_snapshots', function (Blueprint $table) {
              $table->id();
              $table->morphs('origin');
-             $table->json('data');
+             $table->json('storage')->nullable()->default(null);
              $table->timestamps();
         });
     }
