@@ -47,7 +47,7 @@ trait Snapshotable
      *
      * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $extraAttributes
      *
-     * @return array<string, mixed>
+     * @return array<string, VirtualAttributeInterface>
      */
     public function collectSnapshotAttributes(array $extraAttributes = []): array
     {
