@@ -15,8 +15,6 @@ class SnapshotDefinition
      */
     protected array $excludedAttributes = [];
 
-    protected ?string $primaryKeyPrefix = null;
-
     protected bool $shouldCaptureCasts = true;
 
     protected bool $shouldCaptureAllAttributes = false;
@@ -68,23 +66,6 @@ class SnapshotDefinition
     public function captureRelations(array $relations): static
     {
         $this->relations = $relations;
-
-        return $this;
-    }
-
-    /**
-     * Specify the primary key alias for snapshot. If null, the model's name is prefixed by default.
-     * In the following format: snake_cased_mode_name_ + Original key name
-     *
-     * This is done to prevent conflicts on the Snapshot model as the snapshot
-     * model might use the same primary key attribute name as the main model.
-     *
-     * @param  string|null $with An underline is appended
-     * @return $this
-     */
-    public function prefixPrimaryKey(?string $with): static
-    {
-        $this->primaryKeyPrefix = $with . "_";
 
         return $this;
     }
@@ -146,11 +127,6 @@ class SnapshotDefinition
     public function getRelations(): array
     {
         return $this->relations;
-    }
-
-    public function getPrimaryKeyPrefix(): ?string
-    {
-        return $this->primaryKeyPrefix;
     }
 
     public function shouldCaptureCasts(): bool

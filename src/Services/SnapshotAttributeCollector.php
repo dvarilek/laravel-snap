@@ -39,12 +39,11 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             $model = (clone $model)->makeVisible($hiddenAttributes);
         }
 
-        $attributes = $this->filterAttributes($model->attributesToArray(), $definition);
+        // The snapshot already maintains a bond with the original model through a polymorphic relation.
+        // This also prevents naming conflicts with snapshot's key name.
+        unset($model[$model->getKeyName()]);
 
-        // Prefix primary key to prevent naming conflicts on Snapshot model.
-        $this->prefixPrimaryKey($model, $definition, $attributes);
-
-        return $attributes;
+        return $this->filterAttributes($model->attributesToArray(), $definition);
     }
 
     /**
@@ -89,7 +88,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
      */
     private function collectRelatedAttributes(Model $model, array $relationDefinitions, array $basePath = []): array
     {
-        $attributes = [];
+        $collectedAttributes = [];
 
         foreach ($relationDefinitions as $relationDefinition) {
             $this->assertRelationIsValid($model, $relationDefinition);
@@ -97,13 +96,18 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             $relationName = $relationDefinition->getName();
             $relatedModel = $model->$relationName;
 
+            // Relation is valid, but no model exists.
             if (is_null($relatedModel)) {
                 continue;
             }
 
             $currentPath = [...$basePath, $relationName];
 
-            foreach ($this->getModelAttributes($relatedModel, $relationDefinition) as $attribute => $value) {
+            $attributes = $this->getModelAttributes($relatedModel, $relationDefinition);
+            // Always append the primary key for related attributes so they can be identifier later.
+            $attributes[$relatedModel->getKeyName()] = $relatedModel->getOriginal($relatedModel->getKeyName());
+
+            foreach ($attributes as $attribute => $value) {
                 $transferObject = new RelatedAttributeTransferObject(
                     attribute: $attribute,
                     value: $value,
@@ -111,18 +115,18 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
                     relationPath: $currentPath
                 );
 
-                $attributes[TransferObjectHelper::createQualifiedRelationName($transferObject)] = $transferObject;
+                $collectedAttributes[TransferObjectHelper::createQualifiedRelationName($transferObject)] = $transferObject;
             }
 
             $nestedRelationDefinitions = $relationDefinition->getRelations();
 
             // Recursively collect nested related attributes
             if (count($nestedRelationDefinitions) > 0) {
-                $attributes += $this->collectRelatedAttributes($relatedModel, $nestedRelationDefinitions, $currentPath);
+                $collectedAttributes += $this->collectRelatedAttributes($relatedModel, $nestedRelationDefinitions, $currentPath);
             }
         }
 
-        return $attributes;
+        return $collectedAttributes;
     }
 
     /**
@@ -198,33 +202,6 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         }
 
         return $transferObjects;
-    }
-
-    /**
-     * @param  Model $model
-     * @param  array<string, mixed> $attributes
-     * @param  SnapshotDefinition $definition
-     *
-     * @return void
-     */
-    protected function prefixPrimaryKey(Model $model, SnapshotDefinition $definition, array &$attributes): void
-    {
-        $keyName = $model->getKeyName();
-
-        foreach ($attributes as $attribute => $value) {
-            if ($keyName === $attribute) {
-                $prefix = $definition->getPrimaryKeyPrefix();
-
-                $prefixedKey = $prefix
-                    ? $prefix . $keyName
-                    : Str::snake(class_basename($model::class)) . '_' . $keyName;
-
-                $attributes[$prefixedKey] = $value;
-                unset($attributes[$attribute]);
-
-                return;
-            }
-        }
     }
 
     /**

@@ -34,12 +34,11 @@ it('can collect main model attributes', function () {
     unset($attributes['created_at'], $attributes['updated_at']);
 
     expect($attributes)
-        ->toHaveCount(4)
+        ->toHaveCount(3)
         ->toBe([
             'attribute1' => $value1,
             'attribute2' => $value2,
             'attribute3' => $value3,
-            'test_root_model_id' => 1
         ]);
 });
 
@@ -70,7 +69,7 @@ it('can capture only specific attributes', function () {
         ]);
 });
 
-it('primary key is prefixed by default', function () {
+test('primary key is not included in model attributes', function () {
     $collector = app(AttributeCollectorInterface::class);
 
     $model = TestRootModel::query()->create();
@@ -79,28 +78,32 @@ it('primary key is prefixed by default', function () {
 
     $attributes = $collector->getModelAttributes($model, $definition);
 
-    expect($attributes)
-        ->toHaveCount(1)
-        ->toBe([
-            'test_root_model_id' => 1
-        ]);
+    expect($attributes)->toHaveCount(0);
 });
 
-it('primary key is prefixed by a custom prefix', function () {
+test('primary key is always included in related model attributes', function () {
     $collector = app(AttributeCollectorInterface::class);
 
-    $model = TestRootModel::query()->create();
-    $definition = SnapshotDefinition::make()
-        ->prefixPrimaryKey('my_customPrefix')
-        ->capture(['id']);
 
-    $attributes = $collector->getModelAttributes($model, $definition);
+    $parentModel = TestParent1Model::query()->create();
+    $relatedModel = $parentModel->children()->create();
+
+    $definition = SnapshotDefinition::make()
+        ->captureRelations([
+            RelationDefinition::from('parent')
+                ->exclude(['id'])
+        ]);
+
+    $attributes = $collector->getRelatedAttributes($relatedModel, $definition);
 
     expect($attributes)
         ->toHaveCount(1)
-        ->toBe([
-            'my_customPrefix_id' => 1
-        ]);
+        ->toHaveKey('parent_id')
+        ->and($attributes['parent_id'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->cast->toBe('int')
+        ->relationPath->toBe(['parent']);
 });
 
 test('hidden attributes are not captured by default', function () {
@@ -167,10 +170,9 @@ it('can exclude specific attributes', function () {
     $attributes = $collector->getModelAttributes($model, $definition);
 
     expect($attributes)
-        ->toHaveCount(2)
+        ->toHaveCount(1)
         ->toBe([
             'attribute3' => $value3,
-            'test_root_model_id' => 1,
         ]);
 });
 
@@ -228,12 +230,17 @@ it('can capture attributes from related model', function () {
     $attributes = $collector->getRelatedAttributes($childModel, $definition);
 
     expect($attributes)
-        ->toHaveCount(3)
+        ->toHaveCount(4)
         ->toHaveKeys([
+            'parent_id',
             'parent_attribute1',
             'parent_attribute2',
             'parent_attribute3',
         ])
+        ->and($attributes['parent_id'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->relationPath->toBe(['parent'])
         ->and($attributes['parent_attribute1'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('attribute1')
         ->value->toBe($value1)
@@ -287,13 +294,19 @@ it('can capture attributes from multiple relations on the same level', function 
     $attributes = $collector->getRelatedAttributes($childModel, $definition);
 
     expect($attributes)
-        ->toHaveCount(4)
+        ->toHaveCount(6)
         ->toHaveKeys([
+            'parent_id',
             'parent_attribute1',
             'parent_attribute2',
+            'anotherParent_id',
             'anotherParent_attribute1',
             'anotherParent_attribute2',
         ])
+        ->and($attributes['parent_id'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->relationPath->toBe(['parent'])
         ->and($attributes['parent_attribute1'])
         ->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('attribute1')
@@ -304,6 +317,10 @@ it('can capture attributes from multiple relations on the same level', function 
         ->attribute->toBe('attribute2')
         ->value->toBe($parentValue2)
         ->relationPath->toBe(['parent'])
+        ->and($attributes['anotherParent_id'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->relationPath->toBe(['anotherParent'])
         ->and($attributes['anotherParent_attribute1'])
         ->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('attribute1')
@@ -362,15 +379,22 @@ it('can capture attributes from nested related models', function () {
     $attributes = $collector->getRelatedAttributes($childModel, $definition);
 
     expect($attributes)
-        ->toHaveCount(6)
+        ->toHaveCount(8)
         ->toHaveKeys([
+            'parent_id',
             'parent_attribute1',
             'parent_attribute2',
             'parent_attribute3',
+            'parent_parent_id',
             'parent_parent_attribute1',
             'parent_parent_attribute2',
             'parent_parent_attribute3',
         ])
+        ->and($attributes['parent_id'])
+        ->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->relationPath->toBe(['parent'])
         ->and($attributes['parent_attribute1'])
         ->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('attribute1')
@@ -386,6 +410,11 @@ it('can capture attributes from nested related models', function () {
         ->attribute->toBe('attribute3')
         ->value->toBe($parentValue3)
         ->relationPath->toBe(['parent'])
+        ->and($attributes['parent_parent_id'])
+        ->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->relationPath->toBe(['parent', 'parent'])
         ->and($attributes['parent_parent_attribute1'])
         ->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('attribute1')
@@ -498,9 +527,8 @@ it('can collect attributes from model, related model and extra attributes', func
     $attributes = $collector->collectAttributes($childModel, $definition, $extraAttributes);
 
     expect($attributes)
-        ->toHaveCount(13)
+        ->toHaveCount(12)
         ->toHaveKeys([
-            'test_root_model_id',
             'attribute1',
             'attribute2',
             'attribute3',
@@ -509,15 +537,11 @@ it('can collect attributes from model, related model and extra attributes', func
             'parent_attribute1',
             'parent_attribute2',
             'parent_attribute3',
-            'parent_test_parent1_model_id',
+            'parent_id',
             'extraAttribute1',
             'extraAttribute2',
             'extraAttribute3'
         ])
-        ->and($attributes['test_root_model_id'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('test_root_model_id')
-        ->value->toBe(1)
-        ->cast->toBeNull()
         ->and($attributes['attribute1'])->toBeInstanceOf(AttributeTransferObject::class)
         ->attribute->toBe('attribute1')
         ->value->toBe($value1)
@@ -608,7 +632,7 @@ it('can capture casts from model and related model', function () {
     $attributes = $collector->collectAttributes($childModel, $definition);
 
     expect($attributes)
-        ->toHaveCount(2)
+        ->toHaveCount(3)
         ->toHaveKeys([
             'castable1',
             'parent_castable1'
@@ -620,5 +644,9 @@ it('can capture casts from model and related model', function () {
         ->and($attributes['parent_castable1'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
         ->attribute->toBe('castable1')
         ->value->toBe($relatedValue)
-        ->cast->toBe('integer');
+        ->cast->toBe('integer')
+        ->and($attributes['parent_id'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
+        ->attribute->toBe('id')
+        ->value->toBe(1)
+        ->cast->toBe('int');
 });
