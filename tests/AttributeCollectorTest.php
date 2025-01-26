@@ -4,6 +4,7 @@ use Dvarilek\LaravelSnapshotTree\Tests\Models\{TestRootModel, TestParent1Model, 
 use Dvarilek\LaravelSnapshotTree\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
 use Illuminate\Support\Str;
 use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Dvarilek\LaravelSnapshotTree\Services\SnapshotAttributeCollector;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\RelationDefinition;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\SnapshotDefinition;
@@ -32,33 +33,14 @@ it('can collect main model attributes', function () {
     $attributes = $collector->getModelAttributes($model, $definition);
     unset($attributes['created_at'], $attributes['updated_at']);
 
-    expect($attributes)->each(fn($value, $key) => expect($value->value)
-        ->toBeInstanceOf(AttributeTransferObject::class)
-    );
- 
     expect($attributes)
-        ->toHaveKeys([
-            'attribute1',
-            'attribute2',
-            'attribute3',
-            'test_root_model_id'
-        ])
-        ->and($attributes['test_root_model_id'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('test_root_model_id')
-        ->value->toBe("1")
-        ->cast->toBeNull()
-        ->and($attributes['attribute1'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute1')
-        ->value->toBe($value1)
-        ->cast->toBeNull()
-        ->and($attributes['attribute2'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute2')
-        ->value->toBe($value2)
-        ->cast->toBeNull()
-        ->and($attributes['attribute3'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute3')
-        ->value->toBe($value3)
-        ->cast->toBeNull();
+        ->toHaveCount(4)
+        ->toBe([
+            'attribute1' => $value1,
+            'attribute2' => $value2,
+            'attribute3' => $value3,
+            'test_root_model_id' => 1
+        ]);
 });
 
 it('can capture only specific attributes', function () {
@@ -82,15 +64,10 @@ it('can capture only specific attributes', function () {
 
     expect($attributes)
         ->toHaveCount(2)
-        ->toHaveKeys(['attribute1', 'attribute2'])
-        ->and($attributes['attribute1'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute1')
-        ->value->toBe($value1)
-        ->cast->toBeNull()
-        ->and($attributes['attribute2'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute2')
-        ->value->toBe($value2)
-        ->cast->toBeNull();
+        ->toBe([
+            'attribute1' => $value1,
+            'attribute2' => $value2,
+        ]);
 });
 
 it('primary key is prefixed by default', function () {
@@ -104,9 +81,9 @@ it('primary key is prefixed by default', function () {
 
     expect($attributes)
         ->toHaveCount(1)
-        ->toHaveKey('test_root_model_id')
-        ->and($attributes['test_root_model_id'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('test_root_model_id');
+        ->toBe([
+            'test_root_model_id' => 1
+        ]);
 });
 
 it('primary key is prefixed by a custom prefix', function () {
@@ -121,12 +98,12 @@ it('primary key is prefixed by a custom prefix', function () {
 
     expect($attributes)
         ->toHaveCount(1)
-        ->toHaveKey('my_customPrefix_id')
-        ->and($attributes['my_customPrefix_id'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('my_customPrefix_id');
+        ->toBe([
+            'my_customPrefix_id' => 1
+        ]);
 });
 
-it('hidden attributes are not captured by default', function () {
+test('hidden attributes are not captured by default', function () {
     $collector = app(AttributeCollectorInterface::class);
 
     $hidden = Str::random(10);
@@ -160,10 +137,9 @@ it('can capture hidden attributes when specified', function () {
 
     expect($attributes)
         ->toHaveCount(1)
-        ->toHaveKey('hidden1')
-        ->and($attributes['hidden1'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('hidden1')
-        ->value->toBe($hidden);
+        ->toBe([
+            'hidden1' => $hidden
+        ]);
 });
 
 it('can exclude specific attributes', function () {
@@ -192,15 +168,10 @@ it('can exclude specific attributes', function () {
 
     expect($attributes)
         ->toHaveCount(2)
-        ->toHaveKeys(['attribute3', 'test_root_model_id'])
-        ->and($attributes['attribute3'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute3')
-        ->value->toBe($value3)
-        ->cast->toBeNull()
-        ->and($attributes['test_root_model_id'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('test_root_model_id')
-        ->value->toBe("1")
-        ->cast->toBeNull();
+        ->toBe([
+            'attribute3' => $value3,
+            'test_root_model_id' => 1,
+        ]);
 });
 
 it('can capture and exclude attributes at the same time', function () {
@@ -224,11 +195,9 @@ it('can capture and exclude attributes at the same time', function () {
 
     expect($attributes)
         ->toHaveCount(1)
-        ->toHaveKeys(['attribute1'])
-        ->and($attributes['attribute1'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('attribute1')
-        ->value->toBe($value1)
-        ->cast->toBeNull();
+        ->toBe([
+            'attribute1' => $value1,
+        ]);
 });
 
 it('can capture attributes from related model', function () {

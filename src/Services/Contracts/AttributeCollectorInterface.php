@@ -33,7 +33,7 @@ interface AttributeCollectorInterface
      * @param  Model $model
      * @param  SnapshotDefinition $definition
      *
-     * @return array<string, AttributeTransferObject>
+     * @return array<string, mixed>
      */
     public function getModelAttributes(Model $model, SnapshotDefinition $definition): array;
 

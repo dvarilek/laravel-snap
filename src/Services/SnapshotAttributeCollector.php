@@ -20,7 +20,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     public function collectAttributes(Model $model, SnapshotDefinition $definition, array $extraAttributes = []): array
     {
         return [
-            ...$this->getModelAttributes($model, $definition),
+            ...$this->mapToTransferObjects($this->getModelAttributes($model, $definition), $model, $definition),
             ...$this->prepareExtraAttributes($extraAttributes),
             ...$this->getRelatedAttributes($model, $definition),
         ];
@@ -42,7 +42,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         // Prefix primary key to prevent naming conflicts on Snapshot model.
         $this->prefixPrimaryKey($model, $definition, $attributes);
 
-        return $this->mapToTransferObjects($attributes, $definition);
+        return $attributes;
     }
 
     /**
@@ -104,7 +104,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             foreach ($this->getModelAttributes($relatedModel, $relationDefinition) as $attribute => $value) {
                 $transferObject = new RelatedAttributeTransferObject(
                     attribute: $attribute,
-                    value: $value->value,
+                    value: $value,
                     cast: null, // TODO: Add cast from definition
                     relationPath: $currentPath
                 );
