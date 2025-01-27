@@ -140,9 +140,9 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     }
 
     /**
-     * @param  array<> $attributes
+     * @param  array<string, mixed> $attributes
      * @param  Model $model
-     * @return array<string , Virtu>
+     * @return array<string, mixed>
      */
     protected function prepareModelAttributesForSnapshot(array $attributes, Model $model): array
     {
