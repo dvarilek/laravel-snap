@@ -6,10 +6,8 @@ use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
 use Dvarilek\LaravelSnapshotTree\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
 use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
 use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
-use Illuminate\Database\Eloquent\RelationNotFoundException;
-use Illuminate\Support\Str;
+use Dvarilek\LaravelSnapshotTree\Support\RelationValidator;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\{SnapshotDefinition, RelationDefinition};
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class SnapshotAttributeCollector implements AttributeCollectorInterface
@@ -91,7 +89,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         $collectedAttributes = [];
 
         foreach ($relationDefinitions as $relationDefinition) {
-            $this->assertRelationIsValid($model, $relationDefinition);
+            RelationValidator::assertValid($model, $relationDefinition);
 
             $relationName = $relationDefinition->getName();
             $relatedModel = $model->$relationName;
@@ -130,42 +128,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     }
 
     /**
-     * Validate that a relation exists and is of an allowed type
-     *
-     * @param Model $model
-     * @param RelationDefinition $definition
-     */
-    protected function assertRelationIsValid(Model $model, RelationDefinition $definition): void
-    {
-        // TODO: Consider adding package specific exceptions
-        $relationName = $definition->getName();
-
-        if (!$relationName) {
-            throw new \InvalidArgumentException(sprintf('A relationship on model %s does not have a name defined in definition.',
-                    $model::class
-                )
-            );
-        }
-
-        if (!method_exists($model, $relationName)) {
-            throw new RelationNotFoundException(sprintf('The relationship %s does not exist on model %s.',
-                    $relationName, $model::class
-                )
-            );
-        }
-
-        $relation = $model->$relationName();
-
-        if (!$relation instanceof BelongsTo) {
-            throw new \InvalidArgumentException(sprintf('The relationship %s on model %s must be of type %s, %s provided.',
-                    $relationName, $model::class, BelongsTo::class, $relation::class
-                )
-            );
-        }
-    }
-
-    /**
-     * @param  string $attribute
+     * @param  array<> $attributes
      * @param  Model $model
      * @param  SnapshotDefinition $definition
      *
