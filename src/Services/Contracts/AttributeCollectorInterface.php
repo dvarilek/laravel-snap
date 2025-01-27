@@ -2,7 +2,6 @@
 
 namespace Dvarilek\LaravelSnapshotTree\Services\Contracts;
 
-use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\Services\SnapshotAttributeCollector;

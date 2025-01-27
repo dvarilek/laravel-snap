@@ -34,11 +34,12 @@ it('can collect main model attributes', function () {
     unset($attributes['created_at'], $attributes['updated_at']);
 
     expect($attributes)
-        ->toHaveCount(3)
+        ->toHaveCount(4)
         ->toBe([
             'attribute1' => $value1,
             'attribute2' => $value2,
             'attribute3' => $value3,
+            'id' => 1,
         ]);
 });
 
@@ -76,7 +77,7 @@ test('primary key is not included in model attributes', function () {
     $definition = SnapshotDefinition::make()
         ->capture(['id']);
 
-    $attributes = $collector->getModelAttributes($model, $definition);
+    $attributes = $collector->collectAttributes($model, $definition);
 
     expect($attributes)->toHaveCount(0);
 });
@@ -161,6 +162,7 @@ it('can exclude specific attributes', function () {
     $definition = SnapshotDefinition::make()
         ->captureAll()
         ->exclude([
+            'id',
             'attribute1',
             'attribute2',
             'created_at',
@@ -430,48 +432,6 @@ it('can capture attributes from nested related models', function () {
         ->attribute->toBe('attribute3')
         ->value->toBe($grandparentValue3)
         ->relationPath->toBe(['parent', 'parent']);
-});
-
-it('can prepare extra attributes from primitives and transfer objects', function () {
-    $collector = app(AttributeCollectorInterface::class);
-
-    $extraAttribute1 = Str::random(10);
-    $extraAttribute2 = Str::random(10);
-
-    $extraAttribute3 = Str::random(10);
-    $extraRelatedAttribute = Str::random(10);
-
-    $attributes = $collector->prepareExtraAttributes([
-        'extraAttribute1' => $extraAttribute1,
-        'extraAttribute2' => $extraAttribute2,
-        'extraAttribute3' => new AttributeTransferObject('extraAttribute3', $extraAttribute3, null),
-        'extraRelatedAttribute' => new RelatedAttributeTransferObject('extraRelatedAttribute', $extraRelatedAttribute, null, ['path']),
-    ]);
-
-    expect($attributes)
-        ->toHaveCount(4)
-        ->toHaveKeys([
-            'extraAttribute1',
-            'extraAttribute2',
-            'extraAttribute3',
-            'extraRelatedAttribute',
-        ])
-        ->and($attributes['extraAttribute1'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('extraAttribute1')
-        ->value->toBe($extraAttribute1)
-        ->cast->toBeNull()
-        ->and($attributes['extraAttribute2'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('extraAttribute2')
-        ->value->toBe($extraAttribute2)
-        ->cast->toBeNull()
-        ->and($attributes['extraAttribute3'])->toBeInstanceOf(AttributeTransferObject::class)
-        ->attribute->toBe('extraAttribute3')
-        ->value->toBe($extraAttribute3)
-        ->cast->toBeNull()
-        ->and($attributes['extraRelatedAttribute'])->toBeInstanceOf(RelatedAttributeTransferObject::class)
-        ->attribute->toBe('extraRelatedAttribute')
-        ->value->toBe($extraRelatedAttribute)
-        ->cast->toBeNull();
 });
 
 it('can collect attributes from model, related model and extra attributes', function () {

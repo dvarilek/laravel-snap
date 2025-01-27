@@ -18,11 +18,15 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
      */
     public function collectAttributes(Model $model, SnapshotDefinition $definition, array $extraAttributes = []): array
     {
-        $modelAttributes = $this->getModelAttributes($model, $definition);
+        $modelAttributes = $this->prepareModelAttributesForSnapshot(
+            $this->getModelAttributes($model, $definition), $model
+        );
+
+        $casts = $definition->shouldCaptureCasts() ? $model->getCasts() : [];
 
         return [
-            ...$this->mapToTransferObjects($modelAttributes, $model, $definition),
-            ...$this->prepareExtraAttributes($extraAttributes),
+            ...$this->mapToAttributeTransferObjects($modelAttributes, $casts),
+            ...$this->mapToAttributeTransferObjects($extraAttributes),
             ...$this->getRelatedAttributes($model, $definition),
         ];
     }
@@ -37,10 +41,6 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
 
             $model = (clone $model)->makeVisible($hiddenAttributes);
         }
-
-        // The snapshot already maintains a bond with the original model through a polymorphic relation.
-        // This also prevents naming conflicts with snapshot's key name.
-        unset($model[$model->getKeyName()]);
 
         return $this->filterAttributes($model->attributesToArray(), $model, $definition);
     }
@@ -111,16 +111,17 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             }
 
             $currentPath = [...$basePath, $relationName];
+            $casts = $relationDefinition->shouldCaptureCasts() ? $relatedModel->getCasts() : [];
 
+            // Always append the key so related records can be easily identified.
             $attributes = $this->getModelAttributes($relatedModel, $relationDefinition);
-            // Always append the primary key for related attributes so they can be identifier later.
-            $attributes[$relatedModel->getKeyName()] = $relatedModel->getOriginal($relatedModel->getKeyName());
+            $attributes[$relatedModel->getKeyName()] = $relatedModel->getKey();
 
             foreach ($attributes as $attribute => $value) {
                 $transferObject = new RelatedAttributeTransferObject(
                     attribute: $attribute,
                     value: $value,
-                    cast: $this->getCast($attribute, $relatedModel, $relationDefinition),
+                    cast: $casts[$attribute] ?? null,
                     relationPath: $currentPath
                 );
 
@@ -141,59 +142,48 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     /**
      * @param  array<> $attributes
      * @param  Model $model
-     * @param  SnapshotDefinition $definition
-     *
-     * @return string|null
+     * @return array<string , Virtu>
      */
-    protected function getCast(string $attribute, Model $model, SnapshotDefinition $definition): ?string
+    protected function prepareModelAttributesForSnapshot(array $attributes, Model $model): array
     {
-        if (!$definition->shouldCaptureCasts()) {
-            return null;
-        }
+        // The snapshot will already maintain a bond with the original model through a polymorphic relation.
+        // Having a key present is redundant and could potentially result in naming conflicts on the snapshot model.
+        unset($attributes[$model->getKeyName()]);
 
-        return $model->getCasts()[$attribute] ?? null;
-    }
+        $timestampAttributes = ModelHelper::getTimestampAttributes($model);
+        $prefix = config('snapshot-tree.timestamp-prefix');
 
-    /**
-     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $extraAttributes
-     *
-     * @return array<string, mixed>|array<string, VirtualAttributeInterface>
-     */
-    public function prepareExtraAttributes(array $extraAttributes): array
-    {
-        $transferObjects = [];
-
-        foreach ($extraAttributes as $attribute => $value) {
-            if ($value instanceof VirtualAttributeInterface) {
-                $transferObjects[$attribute] = $value;
-            } else {
-                $transferObjects[$attribute] = new AttributeTransferObject(
-                    attribute: $attribute,
-                    value: $value,
-                    cast: null,
-                );
+        foreach ($attributes as $key => $value) {
+            // The prefix has to be added to prevent naming conflicts on the snapshot model.
+            if (in_array($key, $timestampAttributes)) {
+                $attributes[$prefix . $key] = $value;
+                unset($attributes[$key]);
             }
         }
 
-        return $transferObjects;
+        return $attributes;
     }
 
     /**
-     * @param  array<string, mixed> $attributes
-     * @param  SnapshotDefinition $definition
-     * @param  Model $model
+     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $attributes
+     * @param  array $casts
      *
-     * @return array<string, AttributeTransferObject>
+     * @return array
      */
-    protected function mapToTransferObjects(array $attributes, Model $model, SnapshotDefinition $definition): array
+    public function mapToAttributeTransferObjects(array $attributes, array $casts = []): array
     {
         $transferObjects = [];
 
-        foreach ($attributes as $attribute => $value) {
-            $transferObjects[$attribute] = new AttributeTransferObject(
-                attribute: $attribute,
+        foreach ($attributes as $key => $value) {
+            if ($value instanceof VirtualAttributeInterface) {
+                $transferObjects[$key] = $value;
+                continue;
+            }
+
+            $transferObjects[$key] = new AttributeTransferObject(
+                attribute: $key,
                 value: $value,
-                cast: $this->getCast($attribute, $model, $definition)
+                cast: $casts[$key] ?? null,
             );
         }
 
