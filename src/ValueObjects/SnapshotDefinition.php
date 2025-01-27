@@ -17,6 +17,8 @@ class SnapshotDefinition
 
     protected bool $shouldCaptureCasts = true;
 
+    protected bool $shouldExcludeTimestamps = false;
+
     protected bool $shouldCaptureAllAttributes = false;
 
     protected bool $shouldCaptureHiddenAttributes = false;
@@ -77,6 +79,13 @@ class SnapshotDefinition
         return $this;
     }
 
+    public function excludeTimestamps(bool $shouldExcludeTimestamps = true): static
+    {
+        $this->shouldExcludeTimestamps = $shouldExcludeTimestamps;
+
+        return $this;
+    }
+
     /**
      * Capture all model attributes.
      *
@@ -132,6 +141,11 @@ class SnapshotDefinition
     public function shouldCaptureCasts(): bool
     {
         return $this->shouldCaptureCasts;
+    }
+
+    public function shouldExcludeTimestamps(): bool
+    {
+        return $this->shouldExcludeTimestamps;
     }
 
     public function shouldCaptureAllAttributes(): bool

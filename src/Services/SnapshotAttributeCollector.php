@@ -4,6 +4,7 @@ namespace Dvarilek\LaravelSnapshotTree\Services;
 
 use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
 use Dvarilek\LaravelSnapshotTree\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
+use Dvarilek\LaravelSnapshotTree\Helpers\ModelHelper;
 use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
 use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\LaravelSnapshotTree\Support\RelationValidator;
@@ -41,18 +42,19 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         // This also prevents naming conflicts with snapshot's key name.
         unset($model[$model->getKeyName()]);
 
-        return $this->filterAttributes($model->attributesToArray(), $definition);
+        return $this->filterAttributes($model->attributesToArray(), $model, $definition);
     }
 
     /**
      * Filter attributes based on definition rules
      *
      * @param  array<string, mixed> $attributes
+     * @param  Model $model
      * @param  SnapshotDefinition $definition
      *
      * @return array<string, mixed>
      */
-    protected function filterAttributes(array $attributes, SnapshotDefinition $definition): array
+    protected function filterAttributes(array $attributes, Model $model, SnapshotDefinition $definition): array
     {
         if (!$definition->shouldCaptureAllAttributes()) {
             $attributes = array_intersect_key(
@@ -61,9 +63,18 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             );
         }
 
+        $excludedAttributes = $definition->getExcludedAttributes();
+
+        if ($definition->shouldExcludeTimestamps()) {
+            $excludedAttributes = [
+                ...$excludedAttributes,
+                ...ModelHelper::getTimestampAttributes($model),
+            ];
+        }
+
         return array_diff_key(
             $attributes,
-            array_flip($definition->getExcludedAttributes())
+            array_flip($excludedAttributes)
         );
     }
 

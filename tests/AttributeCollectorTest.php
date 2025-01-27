@@ -582,6 +582,82 @@ it('can collect attributes from model, related model and extra attributes', func
         ->cast->toBeNull();
 });
 
+test('having valid relation definition but no model associated through the relation doesnt throw an exception', function () {
+    $collector = app(AttributeCollectorInterface::class);
+
+    $model = TestRootModel::query()->create();
+    $definition = SnapshotDefinition::make()
+        ->captureRelations([
+            RelationDefinition::from('parent')
+                ->captureAll()
+        ]);
+
+    $attributes = $collector->getRelatedAttributes($model, $definition);
+
+    expect($collector)
+        ->not->toThrow(Exception::class)
+        ->and($attributes)->toBeEmpty();
+});
+
+it('can exclude timestamps from being captured', function () {
+    $collector = app(AttributeCollectorInterface::class);
+
+    $value = Str::random(10);
+
+    $model = TestRootModel::query()->create([
+        'attribute1' => $value,
+    ]);
+
+    $definition = SnapshotDefinition::make()
+        ->captureAll()
+        ->excludeTimestamps();
+
+    $attributes = $collector->collectAttributes($model, $definition);
+
+    expect($attributes)
+        ->toHaveCount(1)
+        ->toHaveKey('attribute1')
+        ->and($attributes['attribute1'])->tobeInstanceOf(AttributeTransferObject::class)
+        ->attribute->toBe('attribute1')
+        ->value->toBe($value)
+        ->cast->toBeNull();
+});
+
+it('timestamps are prefixed only on root model', function () {
+    $collector = app(AttributeCollectorInterface::class);
+
+    $value = Str::random(10);
+
+    $parentModel = TestParent1Model::query()->create();
+
+    $childModel = $parentModel->children()->create();
+
+    $definition = SnapshotDefinition::make()
+        ->capture([
+            'created_at',
+            'updated_at'
+        ])
+        ->captureRelations([
+            RelationDefinition::from('parent')
+                ->capture([
+                    'created_at',
+                    'updated_at'
+                ])
+        ]);
+
+    $attributes = $collector->collectAttributes($childModel, $definition);
+
+    expect($attributes)
+        ->toHaveCount(5)
+        ->toHaveKeys([
+            'origin_created_at',
+            'origin_updated_at',
+            'parent_id',
+            'parent_created_at',
+            'parent_updated_at',
+        ]);
+});
+
 it('can exlcude casts from being captured', function () {
     $collector = app(AttributeCollectorInterface::class);
 
