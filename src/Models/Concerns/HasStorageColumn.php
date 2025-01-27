@@ -2,6 +2,7 @@
 
 namespace Dvarilek\LaravelSnapshotTree\Models\Concerns;
 
+use Carbon\Carbon;
 use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
@@ -212,5 +213,20 @@ trait HasStorageColumn
             ?->{static::getStorageColumn()};
 
         return $dataFromDatabase ? json_decode($dataFromDatabase, true) : null;
+    }
+
+    /**
+     * @param  mixed $value
+     *
+     * @return Carbon
+     */
+    protected function asDateTime(mixed $value): Carbon
+    {
+        // This method overwrite is required because asDateTime cannot resolve our custom type on the first encoding.
+        if ($value instanceof VirtualAttributeInterface) {
+            $value = $value->value;
+        }
+
+        return parent::asDateTime($value);
     }
 }
