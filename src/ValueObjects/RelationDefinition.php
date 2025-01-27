@@ -6,7 +6,7 @@ class RelationDefinition extends SnapshotDefinition
 {
 
     public function __construct(
-        protected ?string $name = null
+        protected string $relationName
     ) {}
 
     public static function from(string $relationName): static
@@ -14,15 +14,15 @@ class RelationDefinition extends SnapshotDefinition
         return new static($relationName);
     }
 
-    public function name(string $name): static
+    public function name(string $relationName): static
     {
-        $this->name = $name;
+        $this->relationName = $relationName;
 
         return $this;
     }
 
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->relationName;
     }
 }
