@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\Models;
+namespace Dvarilek\CompleteModelSnapshot\Models;
 
-use Dvarilek\LaravelSnapshotTree\Models\Concerns\HasStorageColumn;
+use Dvarilek\CompleteModelSnapshot\Models\Concerns\HasStorageColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 

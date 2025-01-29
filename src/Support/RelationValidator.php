@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\Support;
+namespace Dvarilek\CompleteModelSnapshot\Support;
 
-use Dvarilek\LaravelSnapshotTree\ValueObjects\RelationDefinition;
+use Dvarilek\CompleteModelSnapshot\ValueObjects\RelationDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

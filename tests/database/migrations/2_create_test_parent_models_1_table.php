@@ -2,9 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Dvarilek\LaravelSnapshotTree\Tests\Models\TestRootModel;
+use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
 use Illuminate\Database\Schema\Blueprint;
-use Dvarilek\LaravelSnapshotTree\Tests\Models\TestParent2Model;
+use Dvarilek\CompleteModelSnapshot\Tests\Models\TestParent2Model;
 
 return new class extends Migration
 {

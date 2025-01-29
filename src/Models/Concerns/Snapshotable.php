@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\Models\Concerns;
+namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
 
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
-use Dvarilek\LaravelSnapshotTree\Models\Snapshot;
-use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
-use Dvarilek\LaravelSnapshotTree\ValueObjects\SnapshotDefinition;
+use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -78,11 +78,11 @@ trait Snapshotable
     protected function getPolymorphicRelationArguments(): array
     {
         return [
-            'related' => config('snapshot-tree.snapshot-model.model'),
-            'name' => config('snapshot-tree.snapshot-model.morph_name'),
-            'type' => config('snapshot-tree.snapshot-model.morph-type'),
-            'id' => config('snapshot-tree.snapshot-model.morph-id'),
-            'localKey' => config('snapshot-tree.snapshot-model.local_key')
+            'related' => config('complete-model-snapshot.snapshot-model.model'),
+            'name' => config('complete-model-snapshot.snapshot-model.morph_name'),
+            'type' => config('complete-model-snapshot.snapshot-model.morph-type'),
+            'id' => config('complete-model-snapshot.snapshot-model.morph-id'),
+            'localKey' => config('complete-model-snapshot.snapshot-model.local_key')
         ];
     }
 }

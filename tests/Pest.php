@@ -8,4 +8,4 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 */
 
-uses(\Dvarilek\LaravelSnapshotTree\Tests\TestCase::class)->in('');
+uses(\Dvarilek\CompleteModelSnapshot\Tests\TestCase::class)->in('');

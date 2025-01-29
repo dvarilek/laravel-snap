@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\Helpers;
+namespace Dvarilek\CompleteModelSnapshot\Helpers;
 
-use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
 
 final class TransferObjectHelper
 {

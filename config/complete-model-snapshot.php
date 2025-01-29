@@ -1,7 +1,7 @@
 <?php
 
-use Dvarilek\LaravelSnapshotTree\Models\Snapshot;
-use Dvarilek\LaravelSnapshotTree\Models\Concerns\Snapshotable;
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
 
 return [
 

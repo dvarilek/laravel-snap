@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
-use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
-use Dvarilek\LaravelSnapshotTree\Models\Snapshot;
+use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Casts\{AsStringable, AsCollection};
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
-use Dvarilek\LaravelSnapshotTree\Tests\Models\TestRootModel;
+use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
 
 it('can create snapshot with virtual attributes', function (mixed $value1, mixed $value2) {
     $value1 = Str::random(10);

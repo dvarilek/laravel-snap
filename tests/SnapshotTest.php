@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Dvarilek\LaravelSnapshotTree\Tests\Models\TestRootModel;
-use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
+use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
-use Dvarilek\LaravelSnapshotTree\Models\Snapshot;
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Str;

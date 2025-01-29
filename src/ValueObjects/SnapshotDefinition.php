@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\ValueObjects;
+namespace Dvarilek\CompleteModelSnapshot\ValueObjects;
 
 class SnapshotDefinition
 {

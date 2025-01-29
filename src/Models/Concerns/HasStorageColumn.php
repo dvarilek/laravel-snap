@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\LaravelSnapshotTree\Models\Concerns;
+namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
 
 use Carbon\Carbon;
-use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
-use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
-use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
+use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
+use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -174,7 +174,7 @@ trait HasStorageColumn
             return match (true) {
                 TransferObjectHelper::isAttributeTransferObjectFormat($dataFromDatabase) => $this->createAttributeTransferObject(...func_get_args()),
                 TransferObjectHelper::isRelationTransferObjectFormat($dataFromDatabase) => $this->createRelatedAttributeTransferObject(...func_get_args()),
-                default => null
+                default => null, // TODO: throw invalid database format exception
             };
         }
 
