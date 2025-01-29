@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dvarilek\LaravelSnapshotTree\Tests\Models\{TestRootModel, TestParent1Model, TestParent2Model, TestAnotherParent1Model};
 use Dvarilek\LaravelSnapshotTree\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
 use Illuminate\Support\Str;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dvarilek\LaravelSnapshotTree\Models;
 
 use Dvarilek\LaravelSnapshotTree\Models\Concerns\HasStorageColumn;

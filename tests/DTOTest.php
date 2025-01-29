@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 use Illuminate\Contracts\Support\Arrayable;

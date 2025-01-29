@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dvarilek\LaravelSnapshotTree\Services;
 
 use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;

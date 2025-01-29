@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dvarilek\LaravelSnapshotTree\Tests\Models\TestRootModel;
 use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
 use Illuminate\Database\Eloquent\Casts\AsStringable;

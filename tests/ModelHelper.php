@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dvarilek\LaravelSnapshotTree\Tests\Models\TestRootModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Dvarilek\LaravelSnapshotTree\Helpers\ModelHelper;

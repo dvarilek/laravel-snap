@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 
