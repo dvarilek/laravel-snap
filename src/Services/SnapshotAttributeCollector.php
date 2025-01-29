@@ -166,9 +166,9 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
 
     /**
      * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $attributes
-     * @param  array $casts
+     * @param  array<string, mixed> $casts
      *
-     * @return array
+     * @return array<string, VirtualAttributeInterface>
      */
     public function mapToAttributeTransferObjects(array $attributes, array $casts = []): array
     {
