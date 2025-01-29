@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\LaravelSnapshotTree\Models\Concerns;
 
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
+use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
 use Dvarilek\LaravelSnapshotTree\Models\Snapshot;
 use Dvarilek\LaravelSnapshotTree\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\SnapshotDefinition;
@@ -43,7 +43,7 @@ trait Snapshotable
     /**
      * Create a model snapshot.
      *
-     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $extraAttributes
+     * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
      * @return Snapshot
      */
@@ -58,9 +58,9 @@ trait Snapshotable
     /**
      * Collect the attributes that should be snapshot.
      *
-     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $extraAttributes
+     * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return array<string, VirtualAttributeInterface>
+     * @return array<string, VirtualAttribute>
      */
     public function collectSnapshotAttributes(array $extraAttributes = []): array
     {

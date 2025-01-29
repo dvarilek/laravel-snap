@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\LaravelSnapshotTree\Services;
 
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
+use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
 use Dvarilek\LaravelSnapshotTree\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
 use Dvarilek\LaravelSnapshotTree\Helpers\ModelHelper;
 use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
@@ -167,17 +167,17 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     }
 
     /**
-     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $attributes
+     * @param  array<string, mixed>|array<string, VirtualAttribute> $attributes
      * @param  array<string, mixed> $casts
      *
-     * @return array<string, VirtualAttributeInterface>
+     * @return array<string, VirtualAttribute>
      */
     public function mapToAttributeTransferObjects(array $attributes, array $casts = []): array
     {
         $transferObjects = [];
 
         foreach ($attributes as $key => $value) {
-            if ($value instanceof VirtualAttributeInterface) {
+            if ($value instanceof VirtualAttribute) {
                 $transferObjects[$key] = $value;
                 continue;
             }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\LaravelSnapshotTree\Services\Contracts;
 
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
+use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\Services\SnapshotAttributeCollector;
 use Dvarilek\LaravelSnapshotTree\ValueObjects\SnapshotDefinition;
@@ -21,9 +21,9 @@ interface AttributeCollectorInterface
      *
      * @param  Model $model
      * @param  SnapshotDefinition $definition
-     * @param  array<string, mixed>|array<string, VirtualAttributeInterface> $extraAttributes
+     * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return array<string, VirtualAttributeInterface>
+     * @return array<string, VirtualAttribute>
      */
     public function collectAttributes(Model $model, SnapshotDefinition $definition, array $extraAttributes = []): array;
 

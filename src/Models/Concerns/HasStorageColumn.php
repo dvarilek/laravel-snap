@@ -6,7 +6,7 @@ namespace Dvarilek\LaravelSnapshotTree\Models\Concerns;
 
 use Carbon\Carbon;
 use Dvarilek\LaravelSnapshotTree\DTO\AttributeTransferObject;
-use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttributeInterface;
+use Dvarilek\LaravelSnapshotTree\DTO\Contracts\VirtualAttribute;
 use Dvarilek\LaravelSnapshotTree\DTO\RelatedAttributeTransferObject;
 use Dvarilek\LaravelSnapshotTree\Helpers\TransferObjectHelper;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +24,7 @@ trait HasStorageColumn
     /**
      * This property keeps the track of virtual attribute's full state throughout encodings in one operation.
      *
-     * @var array<string, VirtualAttributeInterface>
+     * @var array<string, VirtualAttribute>
      */
     protected array $virtualAttributeReferenceMap = [];
 
@@ -154,18 +154,18 @@ trait HasStorageColumn
      * @param  mixed $data
      * @param  array|null $dataFromDatabase
      *
-     * @return null|VirtualAttributeInterface
+     * @return null|VirtualAttribute
      */
-    protected function assembleTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): ?VirtualAttributeInterface
+    protected function assembleTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): ?VirtualAttribute
     {
-        if ($data instanceof VirtualAttributeInterface) {
+        if ($data instanceof VirtualAttribute) {
             return $data;
         }
 
         // Retrieve any previously stored transfer object for this attribute so it doesn't default to creating a new
         // default attribute transfer object when that was already done on the previous encoding.
         $previousData = $this->virtualAttributeReferenceMap[$attribute] ?? null;
-        if ($previousData instanceof VirtualAttributeInterface) {
+        if ($previousData instanceof VirtualAttribute) {
             return $previousData;
         }
 
@@ -225,7 +225,7 @@ trait HasStorageColumn
     protected function asDateTime(mixed $value): Carbon
     {
         // This method overwrite is required because asDateTime cannot resolve our custom type on the first encoding.
-        if ($value instanceof VirtualAttributeInterface) {
+        if ($value instanceof VirtualAttribute) {
             $value = $value->value;
         }
 
