@@ -47,7 +47,7 @@ trait Snapshotable
      *
      * @return Snapshot
      */
-    public function makeSnapshot(array $extraAttributes = []): Snapshot
+    public function takeSnapshot(array $extraAttributes = []): Snapshot
     {
         $attributes = $this->collectSnapshotAttributes($extraAttributes);
 

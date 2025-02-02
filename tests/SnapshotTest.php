@@ -23,7 +23,7 @@ it('can make snapshot', function () {
         'attribute2' => $value2,
     ]);
 
-    $snapshot = $model->makeSnapshot([
+    $snapshot = $model->takeSnapshot([
         'extraAttribute1' => $extraValue1,
         'extraAttribute2' => new AttributeTransferObject('extraAttribute2', $extraValue2, AsStringable::class),
     ]);
@@ -79,13 +79,13 @@ test('latestSnapshot method returns the latest snapshot ', function () {
 
     $model = TestRootModel::query()->create();
 
-    $model->makeSnapshot();
+    $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinute());
 
-    $model->makeSnapshot();
+    $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(2));
 
-    $latestSnapshot = $model->makeSnapshot();
+    $latestSnapshot = $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(3));
 
     expect($model->snapshot)
@@ -98,13 +98,13 @@ test('oldestSnapshot method returns the oldest snapshot ', function () {
 
     $model = TestRootModel::query()->create();
 
-    $oldestSnapshot = $model->makeSnapshot();
+    $oldestSnapshot = $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinute());
 
-    $model->makeSnapshot();
+    $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(2));
 
-    $model->makeSnapshot();
+    $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(3));
 
     expect($model->snapshot)
