@@ -21,7 +21,7 @@ class LaravelCompleteModelSnapshot extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package
-            ->name('complete-model-snapshot')
+            ->name('laravel-complete-model-snapshot')
             ->hasConfigFile()
             ->discoversMigrations()
             ->hasInstallCommand(fn (InstallCommand $command) => $command

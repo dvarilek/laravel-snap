@@ -1,5 +1,5 @@
 {
-    "name": "dvarilek/complete-model-snapshot",
+    "name": "dvarilek/laravel-complete-model-snapshot",
     "description": "A Laravel package for capturing and persisting the state of Eloquent models along with their relationships.",
     "keywords": [
         "laravel",
