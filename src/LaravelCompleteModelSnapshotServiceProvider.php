@@ -10,7 +10,7 @@ use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelPackageTools\Package;
 
-class LaravelCompleteModelSnapshot extends PackageServiceProvider
+class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
 {
 
     public function bootingPackage(): void
