@@ -27,7 +27,7 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(fn (InstallCommand $command) => $command
                 ->publishMigrations()
                 ->askToRunMigrations()
-                ->askToStarRepoOnGitHub('dvarilek/complete-model-snapshot')
+                ->askToStarRepoOnGitHub('dvarilek/laravel-complete-model-snapshot')
             );
     }
 }
