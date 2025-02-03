@@ -114,7 +114,7 @@ SnapshotDefinition::make()
 
 You can customize the timestamp prefix ('origin_') by publishing and modifying the package's configuration file:
 ```bash
-php artisan vendor:publish --tag=laravel-complete-model-snapshot-config
+php artisan vendor:publish --tag=complete-model-snapshot-config
 ```
 
 ### Capturing Related Attributes
