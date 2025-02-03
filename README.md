@@ -25,13 +25,13 @@ state is needed for **compliance with legislative/regulatory requirements** and 
 
 ***
 ## Installation 
-Install the package:
+### 1. Install the package:
 ```bash
 composer require dvarilek/laravel-complete-model-snapshot
 ```
-Initialize the package
+### 2. Initialize the package
 ```bash
-php artisan install laravel-complete-model-snapshot
+php artisan complete-model-snapshot:install
 ```
 ***
 ## Basic Usage & Configuration  
@@ -253,10 +253,20 @@ $snapshot->save();
 ```
 <br>
 
-> > [!IMPORTANT]\
-> For querying snapshots by these attributes using Eloquent Builder, refer to the **Advanced Usage** section.
+#### Querying
+Since the captured attributes aren't actually the snapshot's real attributes, we
+need to query them in the **JSON column**.
 
-***
+For more information about JSON querying see the [**Official Laravel Documentation**](https://laravel.com/docs/10.x/queries#json-where-clauses)
+
+```php
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+
+// For captured attribute by the name 'custodian_name'
+Snapshot::query()->where('storage->custodian_name->value', $value);
+```
+<br>
+
 ## Advanced 
 
 ### Internal Implementation
@@ -353,16 +363,3 @@ $snapshot->update([
 > **This can also be used when adding extra attributes while taking a new snapshots**.
 
 <br>
-
-#### Querying
-Since the captured attributes aren't actually the snapshot's real attributes, we 
-need to query them in the **JSON column**.
- 
-For more information about JSON querying see the [**Official Laravel Documentation**](https://laravel.com/docs/10.x/queries#json-where-clauses)
-
-```php
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
-
-// For captured attribute by the name 'custodian_name'
-Snapshot::query()->where('storage->custodian_name->value', $value);
-```
