@@ -27,17 +27,16 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/database": "^v10.38.0",
-        "illuminate/support": "^v10.38.0",
-        "illuminate/contracts": "^v10.38.0",
+        "illuminate/database": "^10.0|^11.0",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/contracts": "^10.0|^11.0",
         "spatie/laravel-package-tools": "^1.18",
         "stancl/virtualcolumn": "^1.4"
-
     },
     "require-dev": {
-        "illuminate/console": "^v10.38.0",
-        "pestphp/pest": "^2.36",
-        "orchestra/testbench": "^8.31"
+        "illuminate/console": "^10.0|^11.0",
+        "pestphp/pest": "^2.31",
+        "orchestra/testbench": "^8.0|^9.0"
     },
     "extra": {
         "laravel": {
