@@ -43,7 +43,7 @@ final class RelationValidator
 
     /**
      * @param  string $relationName
-     * @param  string<Model> $modelClass
+     * @param  class-string<Model> $modelClass
      *
      * @return never
      */
@@ -58,8 +58,8 @@ final class RelationValidator
 
     /**
      * @param  string $relationName
-     * @param  string<Model> $modelClass
-     * @param  string<Relation> $relationType
+     * @param  class-string<Model> $modelClass
+     * @param  class-string<Relation> $relationType
      *
      * @return never
      */

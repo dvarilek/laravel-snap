@@ -93,7 +93,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     /**
      * @param  Model $model
      * @param  list<RelationDefinition> $relationDefinitions
-     * @param  array $basePath
+     * @param  list<string> $basePath
      *
      * @return array<string, RelatedAttributeTransferObject>
      */
