@@ -152,7 +152,7 @@ trait HasStorageColumn
     /**
      * @param  string $attribute
      * @param  mixed $data
-     * @param  array|null $dataFromDatabase
+     * @param  null|array<string, mixed> $dataFromDatabase
      *
      * @return null|VirtualAttribute
      */
@@ -182,6 +182,13 @@ trait HasStorageColumn
         return $this->createAttributeTransferObject(...func_get_args());
     }
 
+    /**
+     * @param  string $attribute
+     * @param  mixed $data
+     * @param  null|array<string, mixed> $dataFromDatabase
+     *
+     * @return AttributeTransferObject
+     */
     protected function createAttributeTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): AttributeTransferObject
     {
         return new AttributeTransferObject(
@@ -191,6 +198,13 @@ trait HasStorageColumn
         );
     }
 
+    /**
+     * @param  string $attribute
+     * @param  mixed $data
+     * @param  null|array<string, mixed> $dataFromDatabase
+     *
+     * @return RelatedAttributeTransferObject
+     */
     protected function createRelatedAttributeTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): RelatedAttributeTransferObject
     {
         return new RelatedAttributeTransferObject(
@@ -201,6 +215,12 @@ trait HasStorageColumn
         );
     }
 
+    /**
+     * @param  string $attribute
+     * @param  array<string, mixed> $data
+     *
+     * @return void
+     */
     protected function addCast(string $attribute, array $data): void
     {
         if ($cast = $data['cast'] ?? false) {
@@ -208,6 +228,9 @@ trait HasStorageColumn
         }
     }
 
+    /**
+     * @return null|array<string, mixed>
+     */
     protected function getDataFromDatabase(): ?array
     {
         $dataFromDatabase = DB::table($this->getTable())
