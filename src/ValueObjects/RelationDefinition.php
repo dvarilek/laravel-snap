@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot\ValueObjects;
 
-class RelationDefinition extends SnapshotDefinition
+class RelationDefinition extends EloquentSnapshotDefinition
 {
 
     public function __construct(

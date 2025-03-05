@@ -10,7 +10,7 @@ use Dvarilek\CompleteModelSnapshot\Helpers\ModelHelper;
 use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\CompleteModelSnapshot\Support\RelationValidator;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\{SnapshotDefinition, RelationDefinition};
+use Dvarilek\CompleteModelSnapshot\ValueObjects\{EloquentSnapshotDefinition, SnapshotDefinition, RelationDefinition};
 use Illuminate\Database\Eloquent\Model;
 
 class SnapshotAttributeCollector implements AttributeCollectorInterface
@@ -36,7 +36,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     /**
      * @inheritDoc
      */
-    public function getModelAttributes(Model $model, SnapshotDefinition $definition): array
+    public function getModelAttributes(Model $model, EloquentSnapshotDefinition $definition): array
     {
         if ($definition->shouldCaptureHiddenAttributes()) {
             $hiddenAttributes = $model->getHidden();
@@ -52,11 +52,11 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
      *
      * @param  array<string, mixed> $attributes
      * @param  Model $model
-     * @param  SnapshotDefinition $definition
+     * @param  EloquentSnapshotDefinition $definition
      *
      * @return array<string, mixed>
      */
-    protected function filterAttributes(array $attributes, Model $model, SnapshotDefinition $definition): array
+    protected function filterAttributes(array $attributes, Model $model, EloquentSnapshotDefinition $definition): array
     {
         if (!$definition->shouldCaptureAllAttributes()) {
             $attributes = array_intersect_key(
@@ -83,7 +83,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
     /**
      * @inheritDoc
      */
-    public function getRelatedAttributes(Model $model, SnapshotDefinition $definition): array
+    public function getRelatedAttributes(Model $model, EloquentSnapshotDefinition $definition): array
     {
         // TODO: Find a way to handle the collection of attributes inside this method
 
