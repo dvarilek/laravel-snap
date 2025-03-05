@@ -14,11 +14,17 @@ final readonly class AttributeTransferObject implements VirtualAttribute
         public ?string $cast
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
