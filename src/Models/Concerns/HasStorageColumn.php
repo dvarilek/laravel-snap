@@ -248,7 +248,7 @@ trait HasStorageColumn
     protected function asDateTime(mixed $value): Carbon
     {
         // This method overwrite is required because asDateTime cannot resolve our custom type on the first encoding.
-        if ($value instanceof VirtualAttribute) {
+        if ($value instanceof RelatedAttributeTransferObject || $value instanceof AttributeTransferObject) {
             $value = $value->value;
         }
 
