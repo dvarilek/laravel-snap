@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
+ * @template TSnapshotModel of Snapshot | Model
+ *
  * @mixin Model
  *
  * @phpstan-ignore trait.unused
@@ -47,13 +49,13 @@ trait Snapshotable
      *
      * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return Snapshot
+     * @return TSnapshotModel
      */
-    public function takeSnapshot(array $extraAttributes = []): Snapshot
+    public function takeSnapshot(array $extraAttributes = []): Snapshot | Model
     {
         $attributes = $this->collectSnapshotAttributes($extraAttributes);
 
-        /** @var Snapshot */
+        /** @var TSnapshotModel */
         return $this->snapshot()->create($attributes);
     }
 
