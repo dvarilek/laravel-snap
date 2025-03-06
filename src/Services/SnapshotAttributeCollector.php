@@ -29,6 +29,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         return [
             ...$this->mapToAttributeTransferObjects($modelAttributes, $casts),
             ...$this->mapToAttributeTransferObjects($extraAttributes),
+            /** @phpstan-ignore argument.type */ // TODO: refactor
             ...$this->getRelatedAttributes($model, $definition),
         ];
     }

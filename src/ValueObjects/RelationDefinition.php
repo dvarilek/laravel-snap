@@ -13,6 +13,7 @@ class RelationDefinition extends EloquentSnapshotDefinition
 
     public static function from(string $relationName): static
     {
+        /** @phpstan-ignore new.static */
         return new static($relationName);
     }
 

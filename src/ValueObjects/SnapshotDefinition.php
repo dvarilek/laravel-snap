@@ -9,6 +9,7 @@ class SnapshotDefinition extends EloquentSnapshotDefinition
 
     public static function make(): static
     {
+        /** @phpstan-ignore new.static */
         return new static();
     }
 }

@@ -6,4 +6,11 @@ namespace Dvarilek\CompleteModelSnapshot\DTO\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-interface VirtualAttribute extends \JsonSerializable, Arrayable {}
+/** @phpstan-ignore missingType.generics */
+interface VirtualAttribute extends \JsonSerializable, Arrayable
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array;
+}

@@ -22,7 +22,9 @@ class Snapshot extends Model
     }
 
     /**
-     * @inheritDoc
+     * Column that holds encoded attributes.
+     *
+     * @return string
      */
     public static function getStorageColumn(): string
     {
@@ -30,7 +32,9 @@ class Snapshot extends Model
     }
 
     /**
-     * @inheritDoc
+     * Attributes that should not be encoded into the storage column.
+     *
+     * @return list<string>
      */
     public static function getNativeAttributes(): array
     {

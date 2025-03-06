@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @mixin Model
+ *
+ * @phpstan-ignore trait.unused
  */
 trait Snapshotable
 {
