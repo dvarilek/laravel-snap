@@ -16,11 +16,6 @@ class Snapshot extends Model
 
     protected $guarded = [];
 
-    public function origin(): MorphTo
-    {
-        return $this->morphTo();
-    }
-
     /**
      * Column that holds encoded attributes.
      *
@@ -48,4 +43,8 @@ class Snapshot extends Model
         ];
     }
 
+    public function origin(): MorphTo
+    {
+        return $this->morphTo();
+    }
 }
