@@ -124,7 +124,7 @@ trait HasStorageColumn
         $nativeAttributes = static::getNativeAttributes();
         $virtualAttributes = [];
 
-        $dataFromDatabase = $this->getDataFromDatabase();
+        $dataFromDatabase = $this->getRawAttributes();
 
         foreach ($this->getAttributes() as $attribute => $data) {
             if (in_array($attribute, $nativeAttributes)) {
@@ -226,18 +226,6 @@ trait HasStorageColumn
         if ($cast = $data['cast'] ?? false) {
             $this->casts[$attribute] = $cast;
         }
-    }
-
-    /**
-     * @return null|array<string, mixed>
-     */
-    protected function getDataFromDatabase(): ?array
-    {
-        $dataFromDatabase = DB::table($this->getTable())
-            ->find($this->getKey())
-            ?->{static::getStorageColumn()};
-
-        return $dataFromDatabase ? json_decode($dataFromDatabase, true) : null;
     }
 
     /**

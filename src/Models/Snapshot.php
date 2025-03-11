@@ -47,4 +47,16 @@ class Snapshot extends Model
     {
         return $this->morphTo();
     }
+
+    /**
+     * Get the snapshots raw attributes without encoding and decoding.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getRawAttributes(): ?array
+    {
+        $data = $this->newQuery()->toBase()->value(static::getStorageColumn());
+
+        return $data ? json_decode($data, true) : null;
+    }
 }
