@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Dvarilek\CompleteModelSnapshot\Models;
 
 use Dvarilek\CompleteModelSnapshot\Models\Concerns\HasStorageColumn;
+use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Snapshot extends Model
+class Snapshot extends Model implements SnapshotContract
 {
     use HasStorageColumn;
 

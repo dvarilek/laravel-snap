@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot;
 
+use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidConfigurationException;
+use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeCollector;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelPackageTools\Package;
@@ -29,5 +33,24 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
                 ->askToRunMigrations()
                 ->askToStarRepoOnGitHub('dvarilek/laravel-complete-model-snapshot')
             );
+    }
+
+    /**
+     * @return class-string<Model>
+     * @throws InvalidConfigurationException
+     */
+    public static function determineSnapshotModel(): string
+    {
+        $snapshotModel = config('complete-model-snapshot.snapshot-model.model', Snapshot::class);
+
+        if (! is_a($snapshotModel, Model::class, true)) {
+            throw InvalidConfigurationException::modelMustBeSubtypeOfModel($snapshotModel);
+        }
+
+        if (! in_array(SnapshotContract::class, class_implements($snapshotModel))) {
+            throw InvalidConfigurationException::modelMustImplementSnapshotContractInterface();
+        }
+
+        return $snapshotModel;
     }
 }

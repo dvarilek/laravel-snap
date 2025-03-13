@@ -9,14 +9,14 @@ use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
 use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
+use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 /**
  * The internal handling of encoding and decoding to and from "StorageColumn" is derived from
  * VirtualColumn laravel package https://github.com/archtechx/virtualcolumn
  *
- * @mixin Model
+ * @mixin SnapshotContract&Model
  */
 trait HasStorageColumn
 {

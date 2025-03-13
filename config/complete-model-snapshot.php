@@ -1,7 +1,6 @@
 <?php
 
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
 
 return [
 
@@ -9,12 +8,13 @@ return [
      * Configuration for the polymorphic relationships between your models and their snapshots.
      *
      * model      - The Snapshot model class to use for storing model snapshots
+     *            - must implement @see \Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract
      * morph-name - The base name used for polymorphic relations
      * morph-type - The database column storing the parent model's class name
      * morph-id   - The database column storing the parent model's ID
      * local-key  - The primary key of your models (typically 'id')
      *
-     * @see Snapshotable trait for implementation details
+     * @see \Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable trait for implementation details
      */
     'snapshot-model' => [
 

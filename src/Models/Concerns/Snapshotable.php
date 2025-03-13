@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
 
 use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
+use Dvarilek\CompleteModelSnapshot\LaravelCompleteModelSnapshotServiceProvider;
+use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
@@ -13,8 +15,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * @template TSnapshotModel of Snapshot | Model
- *
  * @mixin Model
  *
  * @phpstan-ignore trait.unused
@@ -49,13 +49,13 @@ trait Snapshotable
      *
      * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return TSnapshotModel
+     * @return SnapshotContract&Model
      */
-    public function takeSnapshot(array $extraAttributes = []): Snapshot | Model
+    public function takeSnapshot(array $extraAttributes = []): SnapshotContract&Model
     {
         $attributes = $this->collectSnapshotAttributes($extraAttributes);
 
-        /** @var TSnapshotModel */
+        /** @var SnapshotContract&Model */
         return $this->snapshot()->create($attributes);
     }
 
@@ -82,7 +82,7 @@ trait Snapshotable
     protected function getPolymorphicRelationArguments(): array
     {
         return [
-            'related' => config('complete-model-snapshot.snapshot-model.model'),
+            'related' => LaravelCompleteModelSnapshotServiceProvider::determineSnapshotModel(),
             'name' => config('complete-model-snapshot.snapshot-model.morph_name'),
             'type' => config('complete-model-snapshot.snapshot-model.morph-type'),
             'id' => config('complete-model-snapshot.snapshot-model.morph-id'),
