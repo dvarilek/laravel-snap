@@ -9,6 +9,7 @@ use Dvarilek\CompleteModelSnapshot\LaravelCompleteModelSnapshotServiceProvider;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
 use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -60,10 +61,26 @@ trait Snapshotable
     }
 
     /**
+     * Rewind the model to a concrete snapshot instance.
+     *
+     * @param  Snapshot $snapshot
+     * @param  bool $shouldRestoreRelatedAttributes
+     *
+     * @return Model
+     */
+    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes): Model
+    {
+        /** @var AttributeRestorerInterface $restorer */
+        $restorer = app(AttributeRestorerInterface::class);
+
+        return $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes);
+    }
+
+    /**
      * Collect the attributes that should be snapshot.
      *
      * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
-     *
+     *84
      * @return array<string, VirtualAttribute>
      */
     public function collectSnapshotAttributes(array $extraAttributes = []): array

@@ -8,7 +8,9 @@ use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidConfigurationException;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
 use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeCollector;
+use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeRestorer;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -20,6 +22,8 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
     public function bootingPackage(): void
     {
         $this->app->bind(AttributeCollectorInterface::class, SnapshotAttributeCollector::class);
+
+        $this->app->bind(AttributeRestorerInterface::class, SnapshotAttributeRestorer::class);
     }
 
     public function configurePackage(Package $package): void
@@ -44,11 +48,11 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
         $snapshotModel = config('complete-model-snapshot.snapshot-model.model', Snapshot::class);
 
         if (! is_a($snapshotModel, Model::class, true)) {
-            throw InvalidConfigurationException::modelMustBeSubtypeOfModel($snapshotModel);
+            throw InvalidConfigurationException::snapshotModelMustBeSubtypeOfModel($snapshotModel);
         }
 
         if (! in_array(SnapshotContract::class, class_implements($snapshotModel))) {
-            throw InvalidConfigurationException::modelMustImplementSnapshotContractInterface();
+            throw InvalidConfigurationException::snapshotModelMustImplementSnapshotContractInterface();
         }
 
         return $snapshotModel;

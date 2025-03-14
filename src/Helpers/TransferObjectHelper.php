@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot\Helpers;
 
+use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Illuminate\Database\Eloquent\Model;
 
 final class TransferObjectHelper
 {
@@ -49,5 +51,37 @@ final class TransferObjectHelper
     public static function createQualifiedRelationName(RelatedAttributeTransferObject $transferObject): string
     {
         return implode('_', $transferObject->relationPath) . '_' . $transferObject->attribute;
+    }
+
+    /**
+     * @param  Model $model
+     * @param  array<string, AttributeTransferObject> | array<string, RelatedAttributeTransferObject> $transferObjects
+     *
+     * @return array<string, mixed>
+     */
+    public static function convertTransferObjectAttributesToModelAttributes(Model $model, array $transferObjects): array
+    {
+        $convertedAttributes = [];
+
+        $modelPrimaryKeyName = $model->getKeyName();
+        $modelFillables = $model->getFillable();
+
+        foreach ($transferObjects as $key => $transferObject) {
+            if (! in_array($transferObject->attribute, $modelFillables)) {
+                continue;
+            }
+
+            // Skip the primary key
+            if ($transferObject->attribute === $modelPrimaryKeyName) {
+                continue;
+            }
+
+            // Ensure the attribute gets cast
+            $model->setAttribute($key, $transferObject->value);
+
+            $convertedAttributes[$key] = $model->getAttribute($key);
+        }
+
+        return $convertedAttributes;
     }
 }
