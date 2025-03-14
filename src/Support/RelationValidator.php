@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Dvarilek\CompleteModelSnapshot\Support;
 
 use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidRelationException;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\RelationDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -25,14 +24,12 @@ final class RelationValidator
 
     /**
      * @param  Model $model
-     * @param  RelationDefinition $definition
+     * @param  string $relationName
      *
      * @return void
      */
-    public static function assertValid(Model $model, RelationDefinition $definition): void
+    public static function assertValid(Model $model, string $relationName): void
     {
-        $relationName = $definition->getName();
-
         if (!method_exists($model, $relationName)) {
             throw InvalidRelationException::relationNotFound($relationName, $model::class);
         }
@@ -42,6 +39,5 @@ final class RelationValidator
         if (!in_array($relation::class, self::getValidRelationTypes())) {
             throw InvalidRelationException::invalidRelationType($relationName, $model::class, $relation::class);
         }
-
     }
 }

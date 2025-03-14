@@ -103,7 +103,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         $collectedAttributes = [];
 
         foreach ($relationDefinitions as $relationDefinition) {
-            RelationValidator::assertValid($model, $relationDefinition);
+            RelationValidator::assertValid($model, $relationDefinition->getName());
 
             $relationName = $relationDefinition->getName();
             $relatedModel = $model->$relationName;
