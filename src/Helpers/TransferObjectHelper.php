@@ -71,12 +71,12 @@ final class TransferObjectHelper
                 continue;
             }
 
-            // Skip the primary key
+            // Primary key is irrelevant
             if ($transferObject->attribute === $modelPrimaryKeyName) {
                 continue;
             }
 
-            // Ensure the attribute gets cast
+            // Ensure the attribute gets cast as we didn't perform that
             $model->setAttribute($key, $transferObject->value);
 
             $convertedAttributes[$key] = $model->getAttribute($key);

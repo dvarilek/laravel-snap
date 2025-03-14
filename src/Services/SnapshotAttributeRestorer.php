@@ -52,6 +52,7 @@ class SnapshotAttributeRestorer implements AttributeRestorerInterface
     {
         $relatedAttributeTransferObjectGroups = [];
 
+        // Group the transfer objects by relation path so no redundant and repetitive queries get executed.
         foreach ($relatedSnapshotAttributes as $transferObject) {
             $relationPath = implode("->", $transferObject->relationPath);
 
