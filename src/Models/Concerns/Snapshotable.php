@@ -68,7 +68,7 @@ trait Snapshotable
      *
      * @return Model
      */
-    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes): Model
+    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): Model
     {
         /** @var AttributeRestorerInterface $restorer */
         $restorer = app(AttributeRestorerInterface::class);
