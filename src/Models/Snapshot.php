@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dvarilek\CompleteModelSnapshot\Models;
 
 use Dvarilek\CompleteModelSnapshot\Models\Concerns\HasStorageColumn;
+use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -59,5 +60,20 @@ class Snapshot extends Model implements SnapshotContract
         $data = $this->newQuery()->toBase()->value(static::getStorageColumn());
 
         return $data ? json_decode($data, true) : null;
+    }
+
+    /**
+     * Synchronize the origin's model state with this given snapshot.
+     *
+     * @param  bool $shouldRestoreRelatedAttributes
+     *
+     * @return Model - The origin model
+     */
+    public function sync(bool $shouldRestoreRelatedAttributes = true): Model
+    {
+        /** @var Snapshotable $origin */
+        $origin = $this->origin()->first();
+
+        return $origin->rewindTo($this, $shouldRestoreRelatedAttributes);
     }
 }

@@ -111,3 +111,28 @@ test('oldestSnapshot method returns the oldest snapshot ', function () {
         ->toHaveCount(3)
         ->and($model->oldestSnapshot->getKey())->toBe($oldestSnapshot->getKey());
 });
+
+
+test('sync method synchronizes origin with the given snapshots state', function () {
+    $snapshotValue1 = "snapshotValue1";
+    $snapshotValue2 = "snapshotValue2";
+
+    $model = TestRootModel::query()->create([
+        'attribute1' => $snapshotValue1,
+        'attribute2' => $snapshotValue2,
+    ]);
+
+    $snapshot = $model->takeSnapshot();
+
+    $model->update([
+        'attribute1' => Str::random(10),
+        'attribute2' => Str::random(10),
+    ]);
+
+    $model = $snapshot->sync();
+
+    expect($model)
+        ->toBeInstanceOf(TestRootModel::class)
+        ->attribute1->toBe($snapshotValue1)
+        ->attribute2->toBe($snapshotValue2);
+});
