@@ -19,7 +19,7 @@ it('can create snapshot with virtual attributes', function (mixed $value1, mixed
 
     $model = TestRootModel::query()->create();
 
-    $snapshot = $model->snapshot()->create([
+    $snapshot = $model->snapshots()->create([
         'attribute1' => $value1,
         'attribute2' => $value2,
     ]);
@@ -63,7 +63,7 @@ it('can create snapshot with attribute and related attribute transfer object', f
 
     $model = TestRootModel::query()->create();
 
-    $snapshot = $model->snapshot()->create([
+    $snapshot = $model->snapshots()->create([
         'attribute1' => new AttributeTransferObject('attribute1', $value1, null),
         'attribute2' => new RelatedAttributeTransferObject('attribute2', $value2, null, ['relation']),
     ]);
@@ -107,7 +107,7 @@ it('can create snapshot with attribute and related attribute transfer object', f
 it('can retrieve snapshot with virtual attributes from database', function (mixed $value) {
     $model = TestRootModel::query()->create();
 
-    $snapshot = $model->snapshot()->create([
+    $snapshot = $model->snapshots()->create([
         'value' => $value,
     ]);
 
@@ -129,7 +129,7 @@ it('can update snapshot virtual attribute after creation', function () {
 
     $model = TestRootModel::query()->create();
 
-    $snapshot = $model->snapshot()->create([
+    $snapshot = $model->snapshots()->create([
         'value' => $value,
     ]);
 
@@ -182,7 +182,7 @@ it('can create create virtual attributes with casts', function () {
 
     $model = TestRootModel::query()->create();
 
-    $snapshot = $model->snapshot()->create([
+    $snapshot = $model->snapshots()->create([
         'attribute1' => new AttributeTransferObject('attribute1', $value1, AsStringable::class),
         'attribute2' => new RelatedAttributeTransferObject('attribute2', $value2, AsCollection::class, ['relation']),
     ]);

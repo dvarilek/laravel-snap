@@ -30,7 +30,7 @@ trait Snapshotable
      */
     abstract public static function getSnapshotDefinition(): SnapshotDefinition;
 
-    public function snapshot(): MorphMany
+    public function snapshots(): MorphMany
     {
         return $this->morphMany(...$this->getPolymorphicRelationArguments());
     }
@@ -56,8 +56,8 @@ trait Snapshotable
     {
         $attributes = $this->collectSnapshotAttributes($extraAttributes);
 
-        /** @var SnapshotContract&Model */
-        return $this->snapshot()->create($attributes);
+        /** @var SnapshotContract&Model $snapshot */
+        return $this->snapshots()->create($attributes);
     }
 
     /**

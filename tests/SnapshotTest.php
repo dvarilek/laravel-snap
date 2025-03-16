@@ -88,7 +88,7 @@ test('latestSnapshot method returns the latest snapshot ', function () {
     $latestSnapshot = $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(3));
 
-    expect($model->snapshot)
+    expect($model->snapshots)
         ->toHaveCount(3)
         ->and($model->latestSnapshot->getKey())->toBe($latestSnapshot->getKey());
 });
@@ -107,7 +107,7 @@ test('oldestSnapshot method returns the oldest snapshot ', function () {
     $model->takeSnapshot();
     Carbon::setTestNow(now()->addMinutes(3));
 
-    expect($model->snapshot)
+    expect($model->snapshots)
         ->toHaveCount(3)
         ->and($model->oldestSnapshot->getKey())->toBe($oldestSnapshot->getKey());
 });
