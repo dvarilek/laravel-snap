@@ -73,7 +73,7 @@ trait Snapshotable
         /** @var AttributeRestorerInterface $restorer */
         $restorer = app(AttributeRestorerInterface::class);
 
-        return $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes);
+        return $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
     }
 
     /**

@@ -10,7 +10,6 @@ use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class SnapshotAttributeRestorer implements AttributeRestorerInterface
 {
@@ -20,18 +19,15 @@ class SnapshotAttributeRestorer implements AttributeRestorerInterface
      */
     public function rewindTo(Model $model, SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): Model
     {
-        DB::transaction(function () use ($model, $snapshot, $shouldRestoreRelatedAttributes) {
+        [$modelAttributes, $relatedAttributes] = static::divideSnapshotAttributes($snapshot);
 
-            [$modelAttributes, $relatedAttributes] = static::divideSnapshotAttributes($snapshot);
+        $this->restoreModelAttributes($model, $modelAttributes);
 
-            $this->restoreModelAttributes($model, $modelAttributes);
+        if ($shouldRestoreRelatedAttributes) {
+            $this->restoreRelatedAttributes($model, $relatedAttributes);
+        }
 
-            if ($shouldRestoreRelatedAttributes) {
-                $this->restoreRelatedAttributes($model, $relatedAttributes);
-            }
-        });
-
-        return $model->refresh();
+        return $model;
     }
 
     /**
