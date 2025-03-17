@@ -14,6 +14,8 @@ use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Closure;
+use Illuminate\Events\QueuedClosure;
 
 /**
  * @mixin Model
@@ -50,14 +52,22 @@ trait Snapshotable
      *
      * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return SnapshotContract&Model
+     * @return (SnapshotContract&Model)|null
      */
-    public function takeSnapshot(array $extraAttributes = []): SnapshotContract&Model
+    public function takeSnapshot(array $extraAttributes = []): (SnapshotContract&Model)|null
     {
-        $attributes = $this->collectSnapshotAttributes($extraAttributes);
+        if ($this->fireModelEvent('snapshotting') === false) {
+            return null;
+        }
+
+        $snapshotAttributes = $this->collectSnapshotAttributes($extraAttributes);
 
         /** @var SnapshotContract&Model $snapshot */
-        return $this->snapshots()->create($attributes);
+        $snapshot = $this->getConnection()->transaction(fn () => $this->snapshots()->create($snapshotAttributes));
+
+        $this->fireModelEvent('snapshot');
+
+        return $snapshot;
     }
 
     /**
@@ -66,14 +76,23 @@ trait Snapshotable
      * @param  Snapshot $snapshot
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return Model
+     * @return static|null
      */
-    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): Model
+    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null
     {
+        if ($this->fireModelEvent('rewinding') === false) {
+            return null;
+        }
+
         /** @var AttributeRestorerInterface $restorer */
         $restorer = app(AttributeRestorerInterface::class);
 
-        return $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
+        /** @var static $model */
+        $model = $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
+
+        $this->fireModelEvent('rewound');
+
+        return $model;
     }
 
     /**
@@ -89,6 +108,67 @@ trait Snapshotable
         $collector = app(AttributeCollectorInterface::class);
 
         return $collector->collectAttributes($this, static::getSnapshotDefinition(), $extraAttributes);
+    }
+
+    protected function initializeSnapshotable(): void
+    {
+        $this->observables = [
+            ...$this->observables,
+            ...[
+                'rewinding',
+                'rewound',
+                'snapshotting',
+                'snapshot'
+            ]
+        ];
+    }
+
+    /**
+     * Register a custom rewinding model event with the dispatcher.
+     *
+     * @param  QueuedClosure|Closure|string|array  $callback
+     *
+     * @return void
+     */
+    public static function rewinding(QueuedClosure|Closure|string|array $callback): void
+    {
+        static::registerModelEvent('rewinding', $callback);
+    }
+
+    /**
+     * Register a custom rewound model event with the dispatcher.
+     *
+     * @param  QueuedClosure|Closure|string|array  $callback
+     *
+     * @return void
+     */
+    public static function rewound(QueuedClosure|Closure|string|array $callback): void
+    {
+        static::registerModelEvent('rewound', $callback);
+    }
+
+    /**
+     * Register a custom snapshotting model event with the dispatcher.
+     *
+     * @param  QueuedClosure|Closure|string|array  $callback
+     *
+     * @return void
+     */
+    public static function snapshotting(QueuedClosure|Closure|string|array $callback): void
+    {
+        static::registerModelEvent('snapshotting', $callback);
+    }
+
+    /**
+     * Register a custom snapshot model event with the dispatcher.
+     *
+     * @param  QueuedClosure|Closure|string|array  $callback
+     *
+     * @return void
+     */
+    public static function snapshot(QueuedClosure|Closure|string|array $callback): void
+    {
+        static::registerModelEvent('snapshot', $callback);
     }
 
     /**

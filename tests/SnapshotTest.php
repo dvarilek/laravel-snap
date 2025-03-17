@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
 use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
@@ -112,6 +113,82 @@ test('oldestSnapshot method returns the oldest snapshot ', function () {
         ->and($model->oldestSnapshot->getKey())->toBe($oldestSnapshot->getKey());
 });
 
+
+test('takeSnapshot method dispatches events during the snapshot creation process', function () {
+    Event::fake();
+
+    $model = TestRootModel::query()->create();
+
+    $model->takeSnapshot();
+
+    Event::assertDispatched('eloquent.snapshotting: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+        return $payloadModel->is($model);
+    });
+
+    Event::assertDispatched('eloquent.snapshot: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+        return $payloadModel->is($model);
+    });
+});
+
+test('takeSnapshot operation is canceled when false is returned from snapshotting listener', function () {
+    $class = new class extends TestRootModel {
+        public static function booted(): void
+        {
+            static::snapshotting(fn () => false);
+        }
+    };
+
+    $model = $class::query()->create();
+    $result = $model->takeSnapshot();
+
+    expect($result)
+        ->toBeNull()
+        ->and($model->snapshots)
+        ->toHaveCount(0);
+});
+
+test('rewindTo method dispatches events during the restoration process', function () {
+    Event::fake();
+
+    $model = TestRootModel::query()->create();
+
+    $snapshot = $model->takeSnapshot();
+    $model = $model->rewindTo($snapshot);
+
+    Event::assertDispatched('eloquent.rewinding: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+        return $payloadModel->is($model);
+    });
+
+    Event::assertDispatched('eloquent.rewound: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+        return $payloadModel->is($model);
+    });
+});
+
+test('rewindTo operation is canceled when false is returned from rewinding listener', function () {
+    $class = new class extends TestRootModel {
+        public static function booted(): void
+        {
+            static::rewinding(fn () => false);
+        }
+    };
+
+    $model = $class::query()->create([
+        'attribute1' => 'firstSnapshotValue',
+    ]);
+    $firstSnapshot = $model->takeSnapshot();
+
+    $model->update([
+        'attribute1' => 'secondSnapshotValue',
+    ]);
+    $model->takeSnapshot();
+
+    $result = $model->rewindTo($firstSnapshot);
+
+    expect($result)
+        ->toBeNull()
+        ->and($model)
+        ->attribute1->toBe('secondSnapshotValue');
+});
 
 test('sync method synchronizes origin with the given snapshots state', function () {
     $snapshotValue1 = "snapshotValue1";

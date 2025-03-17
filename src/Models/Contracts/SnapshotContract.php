@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot\Models\Contracts;
 
+use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,7 +39,7 @@ interface SnapshotContract
      *
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return Model - The origin model
+     * @return Model|null - The origin model
     */
-    public function sync(bool $shouldRestoreRelatedAttributes = true): Model;
+    public function sync(bool $shouldRestoreRelatedAttributes = true): Model|null;
 }

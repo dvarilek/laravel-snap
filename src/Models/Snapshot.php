@@ -67,11 +67,11 @@ class Snapshot extends Model implements SnapshotContract
      *
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return Model - The origin model
+     * @return Model|null - The origin model
      */
-    public function sync(bool $shouldRestoreRelatedAttributes = true): Model
+    public function sync(bool $shouldRestoreRelatedAttributes = true): Model|null
     {
-        /** @var Snapshotable $origin */
+        /** @var Model&Snapshotable $origin */
         $origin = $this->origin()->first();
 
         return $origin->rewindTo($this, $shouldRestoreRelatedAttributes);
