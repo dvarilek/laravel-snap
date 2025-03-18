@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
 use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
 use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Illuminate\Support\Facades\Event;
@@ -162,6 +163,17 @@ test('rewindTo method dispatches events during the restoration process', functio
     Event::assertDispatched('eloquent.rewound: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
         return $payloadModel->is($model);
     });
+});
+
+test('rewindTo method accepts only valid snapshots', function () {
+
+    $model = TestRootModel::query()->create();
+    $differentModel = TestRootModel::query()->create();
+
+    $snapshot = $model->takeSnapshot();
+
+    expect(fn () => $differentModel->rewindTo($snapshot))
+        ->toThrow(InvalidSnapshotException::class);
 });
 
 test('rewindTo operation is canceled when false is returned from rewinding listener', function () {

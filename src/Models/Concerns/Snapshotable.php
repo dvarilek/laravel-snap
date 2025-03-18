@@ -10,6 +10,7 @@ use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
 use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
+use Dvarilek\CompleteModelSnapshot\Support\SnapshotValidator;
 use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -80,6 +81,8 @@ trait Snapshotable
      */
     public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null
     {
+        SnapshotValidator::assertValid($snapshot, $this);
+
         if ($this->fireModelEvent('rewinding') === false) {
             return null;
         }
