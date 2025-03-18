@@ -39,7 +39,7 @@ interface SnapshotContract
      *
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return Model|null - The origin model
+     * @return ?Model - The origin model
     */
-    public function sync(bool $shouldRestoreRelatedAttributes = true): Model|null;
+    public function sync(bool $shouldRestoreRelatedAttributes = true): ?Model;
 }

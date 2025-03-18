@@ -77,9 +77,9 @@ trait Snapshotable
      * @param  Snapshot $snapshot
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return static|null
+     * @return ?static
      */
-    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null
+    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): ?static
     {
         SnapshotValidator::assertValid($snapshot, $this);
 
