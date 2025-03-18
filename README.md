@@ -362,4 +362,15 @@ $snapshot->update([
 > This allows to **change/set casts** and potentially rename the attribute entirely.
 > **This can also be used when adding extra attributes while taking a new snapshots**.
 
-<br>
+***
+## Testing
+
+```bash
+composer test && composer stan
+```
+
+## Changelog
+Please refer to [Package Releases](https://github.com/dvarilek/laravel-complete-model-snapshot/releases) for more information about changes.
+
+## License
+This package is under the MIT License. Please refer to [License File](LICENSE.md) for more information
