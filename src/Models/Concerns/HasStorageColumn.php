@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
 use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
 use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
@@ -174,7 +175,7 @@ trait HasStorageColumn
             return match (true) {
                 TransferObjectHelper::isAttributeTransferObjectFormat($dataFromDatabase) => $this->createAttributeTransferObject(...func_get_args()),
                 TransferObjectHelper::isRelationTransferObjectFormat($dataFromDatabase) => $this->createRelatedAttributeTransferObject(...func_get_args()),
-                default => null, // TODO: throw invalid database format exception
+                default => throw InvalidSnapshotException::invalidSnapshotAttributeStructure($attribute, $dataFromDatabase)
             };
         }
 

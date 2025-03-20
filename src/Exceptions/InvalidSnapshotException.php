@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot\Exceptions;
 
+use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +35,23 @@ final class InvalidSnapshotException extends \InvalidArgumentException
             $originModelCandidate->getKey(),
             $snapshotMorphTypeColumn,
             $snapshotMorphKeyColumn
+        ));
+    }
+
+    /**
+     * @param  string $attribute
+     * @param  mixed $value
+     *
+     * @return self
+     */
+    public static function invalidSnapshotAttributeStructure(string $attribute, mixed $value): self
+    {
+        return new self(sprintf(
+            "The Snapshot attribute '%s' has an incorrectly structured value %s, the structure must conform to either %s or %s.",
+            $attribute,
+            $value,
+            AttributeTransferObject::class,
+            RelatedAttributeTransferObject::class
         ));
     }
 }
