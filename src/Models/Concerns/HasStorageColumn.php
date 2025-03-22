@@ -31,20 +31,6 @@ trait HasStorageColumn
 
     protected bool $storageEncoded = false;
 
-    /**
-     * Column that holds encoded attributes.
-     *
-     * @return string
-     */
-    abstract public static function getStorageColumn(): string;
-
-    /**
-     * Attributes that should not be encoded into the storage column.
-     *
-     * @return list<string>
-     */
-    abstract public static function getNativeAttributes(): array;
-
     public function initializeHasStorageColumn(): void
     {
         $this->casts[static::getStorageColumn()] = 'array';
