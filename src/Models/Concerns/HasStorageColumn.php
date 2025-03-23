@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
 
-use Carbon\Carbon;
 use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
 use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
 use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
@@ -12,6 +11,7 @@ use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
 use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * The internal handling of encoding and decoding to and from "StorageColumn" is derived from
@@ -22,14 +22,15 @@ use Illuminate\Database\Eloquent\Model;
 trait HasStorageColumn
 {
 
-    /**
-     * This property keeps the track of virtual attribute's full state throughout encodings in one operation.
-     *
-     * @var array<string, VirtualAttribute>
-     */
-    protected array $virtualAttributeReferenceMap = [];
-
     protected bool $storageEncoded = false;
+
+    /**
+     * This property stores relationPaths for virtual related attributes so that they can
+     * be distinguished from regular virtual attributes.
+     *
+     * @var array<string, list<string>>
+     */
+    protected array $virtualRelatedAttributesPathCache = [];
 
     public function initializeHasStorageColumn(): void
     {
@@ -51,44 +52,29 @@ trait HasStorageColumn
 
     protected function callStorageColumnOperation(string $event): void
     {
-        match (true) {
-            $event === 'retrieved' => $this->forceDecodeStorageAttributes(),
-            in_array($event, ['saving', 'creating', 'updating']) => $this->encodeStorableAttributes(),
-            // Reset reference map after an operation is finished to prevent subsequent conflicts and to make sure that
-            // it doesn't pollute the model instance with additional data.
-            in_array($event, ['created', 'updated']) => $this->virtualAttributeReferenceMap = [],
-            default => null
-        };
-
-    }
-
-    protected function forceDecodeStorageAttributes(): void
-    {
-        $this->storageEncoded = true;
-
-        $this->decodeStorageAttributes();
+        if ($event === 'retrieved') {
+            $this->decodeStorageAttributes();
+        } elseif (!$this->storageEncoded && in_array($event, ['saving', 'creating', 'updating'])) {
+            $this->encodeStorableAttributes();
+        }
     }
 
     /**
-     * Deserializes attributes from the storage column back into model attributes.
+     * Deserialize attributes from the storage column and set them as model's attributes.
      *
      * @return void
      */
     protected function decodeStorageAttributes(): void
     {
-        if (! $this->storageEncoded) {
-            return;
-        }
-
         $storageColumn = static::getStorageColumn();
-        $virtualDecodedAttributes = $this->getAttribute($storageColumn);
 
-        foreach ($virtualDecodedAttributes ?? [] as $attribute => $data) {
+        foreach ($this->getAttribute($storageColumn) ?? [] as $key => $data) {
+            if ($cast = $data['cast'] ?? false) {
+                $this->casts[$key] = $cast;
+            }
 
-            $this->addCast($attribute, $data);
-
-            $this->setAttribute($attribute, $data['value'] ?? null);
-            $this->syncOriginalAttributes($attribute);
+            $this->setAttribute($key, $data['value'] ?? null);
+            $this->syncOriginalAttributes($key);
         }
 
         $this->setAttribute($storageColumn, null);
@@ -98,38 +84,32 @@ trait HasStorageColumn
     }
 
     /**
-     * Serializes model attributes into the designated storage column.
+     * Serialize model attributes into a storage column.
      *
      * @return void
      */
     protected function encodeStorableAttributes(): void
     {
-        if ($this->storageEncoded) {
-            return;
-        }
-
-        $nativeAttributes = static::getNativeAttributes();
+        $nativeAttributeKeys = static::getNativeAttributes();
+        $rawVirtualAttributes = $this->getRawAttributes();
         $virtualAttributes = [];
 
-        $dataFromDatabase = $this->getRawAttributes();
-
-        foreach ($this->getAttributes() as $attribute => $data) {
-            if (in_array($attribute, $nativeAttributes)) {
+        // The attributesToArray() method modifies the model's attributes in a way that causes problems on subsequent
+        // storage column operations. Notably, it performs casting which is actually essential for proper encoding.
+        // Therefore, it needs to be called on a cloned instance of the snapshot model.
+        foreach ((clone $this)->attributesToArray() as $key => $data) {
+            if (in_array($key, $nativeAttributeKeys)) {
                 continue;
             }
 
-            // Structure data into a serializable and correct format.
-            $transferObject = $this->assembleTransferObject($attribute, $data, $dataFromDatabase[$attribute] ?? null);
+            $transferObject = $this->assembleTransferObject($key, $data, $rawVirtualAttributes[$key] ?? null);
+            $virtualAttributes[$key] = $transferObject;
 
-            if ($transferObject) {
-                $virtualAttributes[$attribute] = $transferObject;
-                $this->addCast($attribute, $transferObject->toArray());
-
-                // Save the transfer object as a reference so it can be accessed on the second encoding.
-                $this->virtualAttributeReferenceMap[$attribute] = $transferObject;
+            if ($transferObject instanceof RelatedAttributeTransferObject) {
+                $this->virtualRelatedAttributesPathCache[$key] = $transferObject->relationPath;
             }
 
-            unset($this->attributes[$attribute], $this->original[$attribute]);
+            unset($this->attributes[$key], $this->original[$key]);
         }
 
         $this->setAttribute(static::getStorageColumn(), $virtualAttributes);
@@ -137,96 +117,37 @@ trait HasStorageColumn
     }
 
     /**
-     * @param  string $attribute
-     * @param  mixed $data
-     * @param  null|array<string, mixed> $dataFromDatabase
+     * Prepare a transfer object for serialization into storage column.
      *
-     * @return null|VirtualAttribute
-     */
-    protected function assembleTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): ?VirtualAttribute
-    {
-        if ($data instanceof VirtualAttribute) {
-            return $data;
-        }
-
-        // Retrieve any previously stored transfer object for this attribute so it doesn't default to creating a new
-        // default attribute transfer object when that was already done on the previous encoding.
-        $previousData = $this->virtualAttributeReferenceMap[$attribute] ?? null;
-        if ($previousData instanceof VirtualAttribute) {
-            return $previousData;
-        }
-
-        // When database data is available, reconstruct transfer object based on the data format.
-        if ($dataFromDatabase !== null) {
-            return match (true) {
-                TransferObjectHelper::isAttributeTransferObjectFormat($dataFromDatabase) => $this->createAttributeTransferObject(...func_get_args()),
-                TransferObjectHelper::isRelationTransferObjectFormat($dataFromDatabase) => $this->createRelatedAttributeTransferObject(...func_get_args()),
-                default => throw InvalidSnapshotException::invalidSnapshotAttributeStructure($attribute, $dataFromDatabase)
-            };
-        }
-
-        // Default to creating a simple transfer object.
-        return $this->createAttributeTransferObject(...func_get_args());
-    }
-
-    /**
-     * @param  string $attribute
-     * @param  mixed $data
-     * @param  null|array<string, mixed> $dataFromDatabase
-     *
-     * @return AttributeTransferObject
-     */
-    protected function createAttributeTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): AttributeTransferObject
-    {
-        return new AttributeTransferObject(
-            attribute: $attribute,
-            value: $data,
-            cast: $dataFromDatabase['cast'] ?? null,
-        );
-    }
-
-    /**
-     * @param  string $attribute
-     * @param  mixed $data
-     * @param  null|array<string, mixed> $dataFromDatabase
-     *
-     * @return RelatedAttributeTransferObject
-     */
-    protected function createRelatedAttributeTransferObject(string $attribute, mixed $data, ?array $dataFromDatabase = null): RelatedAttributeTransferObject
-    {
-        return new RelatedAttributeTransferObject(
-            attribute: $attribute,
-            value: $data,
-            cast: $dataFromDatabase['cast'],
-            relationPath: $dataFromDatabase['relationPath'],
-        );
-    }
-
-    /**
-     * @param  string $attribute
-     * @param  array<string, mixed> $data
-     *
-     * @return void
-     */
-    protected function addCast(string $attribute, array $data): void
-    {
-        if ($cast = $data['cast'] ?? false) {
-            $this->casts[$attribute] = $cast;
-        }
-    }
-
-    /**
+     * @param  string $key
      * @param  mixed $value
+     * @param  null|array<string, mixed> $rawVirtualAttribute
      *
-     * @return Carbon
+     * @return VirtualAttribute
+     * @throws InvalidSnapshotException
      */
-    protected function asDateTime(mixed $value): Carbon
+    protected function assembleTransferObject(string $key, mixed $value, ?array $rawVirtualAttribute = null): VirtualAttribute
     {
-        // This method overwrite is required because asDateTime cannot resolve our custom type on the first encoding.
-        if ($value instanceof RelatedAttributeTransferObject || $value instanceof AttributeTransferObject) {
-            $value = $value->value;
+        if ($value instanceof VirtualAttribute) {
+            return $value;
         }
 
-        return parent::asDateTime($value);
+        $cast = $this->casts[$key] ?? null;
+        $cachedRelationPath = $this->virtualRelatedAttributesPathCache[$key] ?? null;
+
+        if (is_array($cachedRelationPath)) {
+            // The key must be stripped of its prefix so that the actual attribute name
+            // is preserved when stored in the storage column.
+            $pathPrefix = implode('_', $cachedRelationPath) . '_';
+            $trimmedKey = Str::replaceFirst($pathPrefix, '', $key);
+
+            return new RelatedAttributeTransferObject($trimmedKey, $value, $cast, $cachedRelationPath);
+        }
+
+        if ($rawVirtualAttribute === null || TransferObjectHelper::isAttributeTransferObjectFormat($rawVirtualAttribute)) {
+            return new AttributeTransferObject($key, $value, $cast);
+        }
+
+        throw InvalidSnapshotException::invalidSnapshotAttributeStructure($key, $rawVirtualAttribute);
     }
 }
