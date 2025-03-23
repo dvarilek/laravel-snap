@@ -71,9 +71,10 @@ class Snapshot extends Model implements SnapshotContract
      */
     public function sync(bool $shouldRestoreRelatedAttributes = true): ?Model
     {
-        /** @var Model&Snapshotable $origin */
-        $origin = $this->origin()->first();
+        /** @var Model $origin */
+        $origin = $this->origin()->get()->first();
 
+        /** @phpstan-ignore method.notFound */
         return $origin->rewindTo($this, $shouldRestoreRelatedAttributes);
     }
 }

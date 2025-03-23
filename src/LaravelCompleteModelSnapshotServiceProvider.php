@@ -45,6 +45,7 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
      */
     public static function determineSnapshotModel(): string
     {
+        /** @var class-string $snapshotModel */
         $snapshotModel = config('complete-model-snapshot.snapshot-model.model', Snapshot::class);
 
         if (! is_a($snapshotModel, Model::class, true)) {
