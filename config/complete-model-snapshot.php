@@ -1,5 +1,7 @@
 <?php
 
+// Configuration file for Complete Model Snapshot Package
+
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 
 return [
@@ -38,6 +40,32 @@ return [
      * Changing this value is not recommended in production as it could lead to problems with
      * data consistency within snapshots.
      */
-     'timestamp-prefix' => 'origin_'
+    'timestamp-prefix' => 'origin_',
 
+    /**
+     * Configure the name and timeout used for locks in snapshotting and rewinding operations.
+     *
+     * Models using the Snapshotable trait will append their table name and primary key
+     * to the specified lock name.This makes sure that lock acquisition is done per model instance
+     * rather than per model class.
+     */
+    'concurrency' => [
+
+        'snapshotting-lock' => [
+
+            'name' => 'snapshotting_atomic_lock',
+
+            'timeout' => 10
+
+        ],
+
+        'rewinding-lock' => [
+
+            'name' => 'rewinding_atomic_lock',
+
+            'timeout' => 10
+
+        ]
+
+    ]
 ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
 
 use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
+use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
 use Dvarilek\CompleteModelSnapshot\LaravelCompleteModelSnapshotServiceProvider;
 use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Closure;
 use Illuminate\Events\QueuedClosure;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @mixin Model
@@ -53,22 +55,30 @@ trait Snapshotable
      *
      * @param  array<string, mixed>|array<string, VirtualAttribute> $extraAttributes
      *
-     * @return (SnapshotContract&Model)|null
+     * @return (SnapshotContract&Model)|null|false
+     *  *   If successful, Snapshot instance gets returned.
+     *  *   If the snapshotting Eloquent event gets cancelled, null gets returned.
+     *  *   If another process has already acquired the lock, false gets returned.
      */
-    public function takeSnapshot(array $extraAttributes = []): (SnapshotContract&Model)|null
+    public function takeSnapshot(array $extraAttributes = []): (SnapshotContract&Model)|null|false
     {
-        if ($this->fireModelEvent('snapshotting') === false) {
-            return null;
-        }
+        $lockName = $this->suffixLockName(config('complete-model-snapshot.concurrency.snapshotting-lock.name'));
+        $lockTimeout = config('complete-model-snapshot.concurrency.snapshotting-lock.timeout');
 
-        $snapshotAttributes = $this->collectSnapshotAttributes($extraAttributes);
+        /** @var (SnapshotContract&Model)|null|false */
+        return Cache::lock($lockName, $lockTimeout)->get(function () use ($extraAttributes) {
+            if ($this->fireModelEvent('snapshotting') === false) {
+                return null;
+            }
 
-        /** @var SnapshotContract&Model $snapshot */
-        $snapshot = $this->getConnection()->transaction(fn () => $this->snapshots()->create($snapshotAttributes));
+            $snapshotAttributes = $this->collectSnapshotAttributes($extraAttributes);
 
-        $this->fireModelEvent('snapshot');
+            $snapshot = $this->getConnection()->transaction(fn () => $this->snapshots()->create($snapshotAttributes));
 
-        return $snapshot;
+            $this->fireModelEvent('snapshot');
+
+            return $snapshot;
+        });
     }
 
     /**
@@ -77,25 +87,35 @@ trait Snapshotable
      * @param  Snapshot $snapshot
      * @param  bool $shouldRestoreRelatedAttributes
      *
-     * @return ?static
+     * @return static|null|false
+     *  *   If successful, the current instance with updated state gets returned.
+     *  *   If the rewinding Eloquent event gets cancelled, null gets returned.
+     *  *   If another process has already acquired the lock, false gets returned.
+     *
+     * @throws InvalidSnapshotException
      */
-    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): ?static
+    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null|false
     {
         SnapshotValidator::assertValid($snapshot, $this);
 
-        if ($this->fireModelEvent('rewinding') === false) {
-            return null;
-        }
+        $lockName = $this->suffixLockName(config('complete-model-snapshot.concurrency.rewinding-lock.name'));
+        $lockTimeout = config('complete-model-snapshot.concurrency.rewinding-lock.timeout');
 
-        /** @var AttributeRestorerInterface $restorer */
-        $restorer = app(AttributeRestorerInterface::class);
+        /** @var static|null|false */
+        return Cache::lock($lockName, $lockTimeout)->get(function () use ($snapshot, $shouldRestoreRelatedAttributes) {
+            if ($this->fireModelEvent('rewinding') === false) {
+                return null;
+            }
 
-        /** @var static $model */
-        $model = $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
+            /** @var AttributeRestorerInterface $restorer */
+            $restorer = app(AttributeRestorerInterface::class);
 
-        $this->fireModelEvent('rewound');
+            $model = $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
 
-        return $model;
+            $this->fireModelEvent('rewound');
+
+            return $model;
+        });
     }
 
     /**
@@ -188,5 +208,18 @@ trait Snapshotable
             'id' => config('complete-model-snapshot.snapshot-model.morph-id'),
             'localKey' => config('complete-model-snapshot.snapshot-model.local_key')
         ];
+    }
+
+    /**
+     * The key has to be suffixed with table and key because Snapshotable trait
+     * can be applied to multiple different models.
+     *
+     * @param  string $lockName
+     *
+     * @return string
+     */
+    protected function suffixLockName(string $lockName): string
+    {
+        return $lockName . "_" . $this->getTable() . "_" . $this->getKey();
     }
 }

@@ -5,10 +5,13 @@ declare(strict_types=1);
 use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
 use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
 use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
+use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -224,4 +227,45 @@ test('sync method synchronizes origin with the given snapshots state', function 
         ->toBeInstanceOf(TestRootModel::class)
         ->attribute1->toBe($snapshotValue1)
         ->attribute2->toBe($snapshotValue2);
+});
+
+test('concurrent snapshot creation is prevented', function () {
+    /** @var TestRootModel $model */
+    $model = TestRootModel::query()->create();
+
+    $lock = Cache::lock(
+        config('complete-model-snapshot.concurrency.snapshotting-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
+        config('complete-model-snapshot.concurrency.snapshotting-lock.timeout')
+    );
+    $lock->acquire();
+
+    try {
+        $result = $model->takeSnapshot();
+
+        expect($result)->toBeFalse();
+    } finally {
+        $lock->release();
+    }
+});
+
+test('concurrent snapshot rewinding is prevented', function () {
+    /** @var TestRootModel $model */
+    $model = TestRootModel::query()->create();
+
+    $lock = Cache::lock(
+        config('complete-model-snapshot.concurrency.rewinding-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
+        config('complete-model-snapshot.concurrency.rewinding-lock.timeout')
+    );
+    $lock->acquire();
+
+    /** @var SnapshotContract&Model $firstSnapshot */
+    $firstSnapshot = $model->takeSnapshot();
+
+    try {
+        $result = $model->rewindTo($firstSnapshot);
+
+        expect($result)->toBeFalse();
+    } finally {
+        $lock->release();
+    }
 });
