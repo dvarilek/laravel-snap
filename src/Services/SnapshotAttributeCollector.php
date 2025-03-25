@@ -45,20 +45,21 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
             $model = (clone $model)->makeVisible($hiddenAttributes);
         }
 
-        return $this->filterAttributes($model->attributesToArray(), $model, $definition);
+        return $this->filterAttributes($model, $definition);
     }
 
     /**
      * Filter attributes based on definition rules
      *
-     * @param  array<string, mixed> $attributes
      * @param  Model $model
      * @param  EloquentSnapshotDefinition $definition
      *
      * @return array<string, mixed>
      */
-    protected function filterAttributes(array $attributes, Model $model, EloquentSnapshotDefinition $definition): array
+    protected function filterAttributes(Model $model, EloquentSnapshotDefinition $definition): array
     {
+        $attributes = $model->attributesToArray();
+
         if (!$definition->shouldCaptureAllAttributes()) {
             $attributes = array_intersect_key(
                 $attributes,
