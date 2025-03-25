@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Casts\{AsStringable, AsCollection};
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
-use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
+use Dvarilek\LaravelSnap\Tests\Models\TestRootModel;
 
 test('snapshot can be created with regular virtual attributes with values', function () {
     $model = TestRootModel::query()->create();

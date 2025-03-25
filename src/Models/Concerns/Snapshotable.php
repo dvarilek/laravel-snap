@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
+namespace Dvarilek\LaravelSnap\Models\Concerns;
 
-use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
-use Dvarilek\CompleteModelSnapshot\LaravelCompleteModelSnapshotServiceProvider;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
-use Dvarilek\CompleteModelSnapshot\Support\SnapshotValidator;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
+use Dvarilek\LaravelSnap\DTO\Contracts\VirtualAttribute;
+use Dvarilek\LaravelSnap\Exceptions\InvalidSnapshotException;
+use Dvarilek\LaravelSnap\LaravelSnapServiceProvider;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Models\Snapshot;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeRestorerInterface;
+use Dvarilek\LaravelSnap\Support\SnapshotValidator;
+use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -62,8 +62,8 @@ trait Snapshotable
      */
     public function takeSnapshot(array $extraAttributes = []): (SnapshotContract&Model)|null|false
     {
-        $lockName = $this->suffixLockName(config('complete-model-snapshot.concurrency.snapshotting-lock.name'));
-        $lockTimeout = config('complete-model-snapshot.concurrency.snapshotting-lock.timeout');
+        $lockName = $this->suffixLockName(config('laravel-snap.concurrency.snapshotting-lock.name'));
+        $lockTimeout = config('laravel-snap.concurrency.snapshotting-lock.timeout');
 
         /** @var (SnapshotContract&Model)|null|false */
         return Cache::lock($lockName, $lockTimeout)->get(function () use ($extraAttributes) {
@@ -98,8 +98,8 @@ trait Snapshotable
     {
         SnapshotValidator::assertValid($snapshot, $this);
 
-        $lockName = $this->suffixLockName(config('complete-model-snapshot.concurrency.rewinding-lock.name'));
-        $lockTimeout = config('complete-model-snapshot.concurrency.rewinding-lock.timeout');
+        $lockName = $this->suffixLockName(config('laravel-snap.concurrency.rewinding-lock.name'));
+        $lockTimeout = config('laravel-snap.concurrency.rewinding-lock.timeout');
 
         /** @var static|null|false */
         return Cache::lock($lockName, $lockTimeout)->get(function () use ($snapshot, $shouldRestoreRelatedAttributes) {
@@ -202,11 +202,11 @@ trait Snapshotable
     protected function getPolymorphicRelationArguments(): array
     {
         return [
-            'related' => LaravelCompleteModelSnapshotServiceProvider::determineSnapshotModel(),
-            'name' => config('complete-model-snapshot.snapshot-model.morph_name'),
-            'type' => config('complete-model-snapshot.snapshot-model.morph-type'),
-            'id' => config('complete-model-snapshot.snapshot-model.morph-id'),
-            'localKey' => config('complete-model-snapshot.snapshot-model.local_key')
+            'related' => LaravelSnapServiceProvider::determineSnapshotModel(),
+            'name' => config('laravel-snap.snapshot-model.morph_name'),
+            'type' => config('laravel-snap.snapshot-model.morph-type'),
+            'id' => config('laravel-snap.snapshot-model.morph-id'),
+            'localKey' => config('laravel-snap.snapshot-model.local_key')
         ];
     }
 

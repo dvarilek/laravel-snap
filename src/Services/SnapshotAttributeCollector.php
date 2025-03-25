@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Services;
+namespace Dvarilek\LaravelSnap\Services;
 
-use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
-use Dvarilek\CompleteModelSnapshot\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
-use Dvarilek\CompleteModelSnapshot\Helpers\ModelHelper;
-use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
-use Dvarilek\CompleteModelSnapshot\Support\RelationValidator;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\{EloquentSnapshotDefinition, SnapshotDefinition, RelationDefinition};
+use Dvarilek\LaravelSnap\DTO\Contracts\VirtualAttribute;
+use Dvarilek\LaravelSnap\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
+use Dvarilek\LaravelSnap\Helpers\ModelHelper;
+use Dvarilek\LaravelSnap\Helpers\TransferObjectHelper;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\LaravelSnap\Support\RelationValidator;
+use Dvarilek\LaravelSnap\ValueObjects\{EloquentSnapshotDefinition, SnapshotDefinition, RelationDefinition};
 use Illuminate\Database\Eloquent\Model;
 
 class SnapshotAttributeCollector implements AttributeCollectorInterface
@@ -155,7 +155,7 @@ class SnapshotAttributeCollector implements AttributeCollectorInterface
         unset($attributes[$model->getKeyName()]);
 
         $timestampAttributes = ModelHelper::getTimestampAttributes($model);
-        $prefix = config('complete-model-snapshot.timestamp-prefix');
+        $prefix = config('laravel-snap.timestamp-prefix');
 
         foreach ($attributes as $key => $value) {
             // The prefix has to be added to prevent naming conflicts on the snapshot model.

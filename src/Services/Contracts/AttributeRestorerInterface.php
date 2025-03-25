@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Services\Contracts;
+namespace Dvarilek\LaravelSnap\Services\Contracts;
 
-use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
-use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeRestorer;
+use Dvarilek\LaravelSnap\DTO\Contracts\VirtualAttribute;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Services\SnapshotAttributeRestorer;
 use Illuminate\Database\Eloquent\Model;
 
 /**

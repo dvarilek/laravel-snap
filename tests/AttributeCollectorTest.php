@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\Tests\Models\{TestRootModel, TestParent1Model, TestParent2Model, TestAnotherParent1Model};
-use Dvarilek\CompleteModelSnapshot\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
+use Dvarilek\LaravelSnap\Tests\Models\{TestRootModel, TestParent1Model, TestParent2Model, TestAnotherParent1Model};
+use Dvarilek\LaravelSnap\DTO\{AttributeTransferObject, RelatedAttributeTransferObject};
 use Illuminate\Support\Str;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeCollectorInterface;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
-use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeCollector;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\RelationDefinition;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
+use Dvarilek\LaravelSnap\Services\SnapshotAttributeCollector;
+use Dvarilek\LaravelSnap\ValueObjects\RelationDefinition;
+use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Model;
 
 test('default attribute collector is an instance of SnapshotAttributeCollector', function () {

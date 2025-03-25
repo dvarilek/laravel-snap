@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Support;
+namespace Dvarilek\LaravelSnap\Support;
 
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Exceptions\InvalidSnapshotException;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 
 final class SnapshotValidator
@@ -19,8 +19,8 @@ final class SnapshotValidator
      */
     public static function assertValid(SnapshotContract&Model $snapshot, Model $originModelCandidate): void
     {
-        $morphTypeColumn = config('complete-model-snapshot.snapshot-model.morph-type');
-        $morphKeyColumn = config('complete-model-snapshot.snapshot-model.morph-id');
+        $morphTypeColumn = config('laravel-snap.snapshot-model.morph-type');
+        $morphKeyColumn = config('laravel-snap.snapshot-model.morph-id');
 
         if (
             $snapshot->$morphTypeColumn !== $originModelCandidate::class ||

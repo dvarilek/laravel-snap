@@ -1,8 +1,8 @@
 <?php
 
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidRelationException;
-use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
-use Dvarilek\CompleteModelSnapshot\Support\RelationValidator;
+use Dvarilek\LaravelSnap\Exceptions\InvalidRelationException;
+use Dvarilek\LaravelSnap\Tests\Models\TestRootModel;
+use Dvarilek\LaravelSnap\Support\RelationValidator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 

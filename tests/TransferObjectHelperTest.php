@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Helpers\TransferObjectHelper;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
 
 test('isRelationTransferObjectFormat returns true for valid relation data', function () {
     $validRelationData = [

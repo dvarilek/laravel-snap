@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\ValueObjects;
+namespace Dvarilek\LaravelSnap\ValueObjects;
 
 class RelationDefinition extends EloquentSnapshotDefinition
 {

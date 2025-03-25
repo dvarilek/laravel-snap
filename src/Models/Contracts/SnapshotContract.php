@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Models\Contracts;
+namespace Dvarilek\LaravelSnap\Models\Contracts;
 
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
+use Dvarilek\LaravelSnap\Models\Snapshot;
 use Illuminate\Database\Eloquent\Model;
 
 /**

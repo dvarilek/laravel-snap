@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Helpers;
+namespace Dvarilek\LaravelSnap\Helpers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

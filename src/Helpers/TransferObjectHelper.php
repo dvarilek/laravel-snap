@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Helpers;
+namespace Dvarilek\LaravelSnap\Helpers;
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
 use Illuminate\Database\Eloquent\Model;
 
 final class TransferObjectHelper

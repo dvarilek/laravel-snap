@@ -1,4 +1,4 @@
-# Laravel Complete Model Snapshot
+# Laravel Snap
 
 > [!CAUTION]
 > This package is currently in early stages of active development and should not be used in production environments.
@@ -21,20 +21,20 @@ essential.
 ## Installation 
 ### 1. Install the package:
 ```bash
-composer require dvarilek/laravel-complete-model-snapshot
+composer require dvarilek/laravel-snap
 ```
 ### 2. Initialize the package
 ```bash
-php artisan complete-model-snapshot:install
+php artisan laravel-snap:install
 ```
 ***
 ## Basic Usage & Configuration  
 
 Firstly, we need to make our Eloquent model snapshotable and configure what should and shouldn't get captured in our snapshot.
-Start by using the Snapshotable trait in your Model:
+The configuration happens through a SnapshotDefinition. Start by using the Snapshotable trait in your Model:
 ```php
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
+use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
+use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
 
 class MyModel extends Model
 {
@@ -106,7 +106,7 @@ SnapshotDefinition::make()
 
 You can customize the timestamp prefix ('origin_') by publishing and modifying the package's configuration file:
 ```bash
-php artisan vendor:publish --tag=complete-model-snapshot-config
+php artisan vendor:publish --tag=laravel-snap-config
 ```
 
 ### Capturing Related Attributes
@@ -116,7 +116,7 @@ being prefixed by their relation path relative to the main model. This is done t
 
 To capture related attributes you need to provide a RelationDefinition(s):
 ```php
-use Dvarilek\CompleteModelSnapshot\ValueObjects\{SnapshotDefinition, RelationDefinition}
+use Dvarilek\LaravelSnap\ValueObjects\{SnapshotDefinition, RelationDefinition}
 
 SnapshotDefinition::make()
     ->captureRelations([
@@ -149,7 +149,7 @@ SnapshotDefinition::make()
 For deeply nested related attributes the same prefix rules apply. You can capture them
 by capturing them like this:
 ```php
-use Dvarilek\CompleteModelSnapshot\ValueObjects\{SnapshotDefinition, RelationDefinition}
+use Dvarilek\LaravelSnap\ValueObjects\{SnapshotDefinition, RelationDefinition}
 
 SnapshotDefinition::make()
     ->captureRelations([
@@ -180,7 +180,7 @@ SnapshotDefinition::make()
 A single model can have multiple snapshots. To create new snapshot call the takeSnapshot method on your Snapshotable model.
 
 ```php
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\LaravelSnap\Models\Snapshot;
 use Illuminate\Database\Eloquent\Model;
 
 /** @var Snapshot&Model $snapshot */
@@ -247,7 +247,7 @@ Since snapshot attributes are stored in a json column, they can't be queried dir
 the JSON column. For more information about JSON querying see the [**Official Laravel Documentation**](https://laravel.com/docs/10.x/queries#json-where-clauses)
 
 ```php
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\LaravelSnap\Models\Snapshot;
 
 // For captured attribute by the name 'custodian_name'
 Snapshot::query()->where('storage->custodian_name->value', $value);
@@ -281,8 +281,8 @@ $model = $model->latestSnapshot->sync();
 While working with snapshots, you can hook into the snapshotting and rewinding processes.
 
 ```php
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
+use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
+use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
 
 class MyModel extends Model
 {
@@ -377,7 +377,7 @@ Internally, all snapshot attribute sare set using special DTO's. These DTO's can
 with extra metadata e.g. setting/changing casts etc. 
 
 ```php
-use Dvarilek\CompleteModelSnapshot\DTO\{AttributeTransferObject, RelatedAttributeTransferObject}
+use Dvarilek\LaravelSnap\DTO\{AttributeTransferObject, RelatedAttributeTransferObject}
 use Illuminate\Database\Eloquent\Casts\{AsStringable, AsCollection};
 
 $snapshot->update([
@@ -416,7 +416,7 @@ composer test && composer stan
 ```
 
 ## Changelog
-Please refer to [Package Releases](https://github.com/dvarilek/laravel-complete-model-snapshot/releases) for more information about changes.
+Please refer to [Package Releases](https://github.com/dvarilek/laravel-snap/releases) for more information about changes.
 
 ## License
 This package is under the MIT License. Please refer to [License File](LICENSE.md) for more information

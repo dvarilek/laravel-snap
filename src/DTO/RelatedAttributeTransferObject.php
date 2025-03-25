@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\DTO;
+namespace Dvarilek\LaravelSnap\DTO;
 
-use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
+use Dvarilek\LaravelSnap\DTO\Contracts\VirtualAttribute;
 
 final readonly class RelatedAttributeTransferObject implements VirtualAttribute
 {

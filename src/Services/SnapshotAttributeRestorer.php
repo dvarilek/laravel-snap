@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Services;
+namespace Dvarilek\LaravelSnap\Services;
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Helpers\TransferObjectHelper;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeRestorerInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class SnapshotAttributeRestorer implements AttributeRestorerInterface

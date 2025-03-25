@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot;
+namespace Dvarilek\LaravelSnap;
 
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidConfigurationException;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeCollectorInterface;
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
-use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeCollector;
-use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeRestorer;
+use Dvarilek\LaravelSnap\Exceptions\InvalidConfigurationException;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Models\Snapshot;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeCollectorInterface;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeRestorerInterface;
+use Dvarilek\LaravelSnap\Services\SnapshotAttributeCollector;
+use Dvarilek\LaravelSnap\Services\SnapshotAttributeRestorer;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelPackageTools\Package;
 
-class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
+class LaravelSnapServiceProvider extends PackageServiceProvider
 {
 
     public function bootingPackage(): void
@@ -29,13 +29,14 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package
-            ->name('laravel-complete-model-snapshot')
-            ->hasConfigFile()
+            ->name('laravel-snap')
+            ->hasConfigFile('laravel-snap')
             ->discoversMigrations()
             ->hasInstallCommand(fn (InstallCommand $command) => $command
+                ->setName('laravel-snap:install')
                 ->publishMigrations()
                 ->askToRunMigrations()
-                ->askToStarRepoOnGitHub('dvarilek/laravel-complete-model-snapshot')
+                ->askToStarRepoOnGitHub('dvarilek/laravel-snap')
             );
     }
 
@@ -46,7 +47,7 @@ class LaravelCompleteModelSnapshotServiceProvider extends PackageServiceProvider
     public static function determineSnapshotModel(): string
     {
         /** @var class-string $snapshotModel */
-        $snapshotModel = config('complete-model-snapshot.snapshot-model.model', Snapshot::class);
+        $snapshotModel = config('laravel-snap.snapshot-model.model', Snapshot::class);
 
         if (! is_a($snapshotModel, Model::class, true)) {
             throw InvalidConfigurationException::snapshotModelMustBeSubtypeOfModel($snapshotModel);

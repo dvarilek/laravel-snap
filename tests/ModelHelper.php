@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
+use Dvarilek\LaravelSnap\Tests\Models\TestRootModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Dvarilek\CompleteModelSnapshot\Helpers\ModelHelper;
+use Dvarilek\LaravelSnap\Helpers\ModelHelper;
 
 test('gets basic timestamp attributes from model', function () {
     $model = new TestRootModel();

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Models;
+namespace Dvarilek\LaravelSnap\Models;
 
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\HasStorageColumn;
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Models\Concerns\HasStorageColumn;
+use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 

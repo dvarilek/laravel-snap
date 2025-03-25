@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
-use Dvarilek\CompleteModelSnapshot\Tests\Models\TestRootModel;
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\Exceptions\InvalidSnapshotException;
+use Dvarilek\LaravelSnap\Tests\Models\TestRootModel;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
-use Dvarilek\CompleteModelSnapshot\Models\Snapshot;
+use Dvarilek\LaravelSnap\Models\Snapshot;
 use Illuminate\Support\Facades\DB;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Str;
@@ -234,8 +234,8 @@ test('concurrent snapshot creation is prevented', function () {
     $model = TestRootModel::query()->create();
 
     $lock = Cache::lock(
-        config('complete-model-snapshot.concurrency.snapshotting-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
-        config('complete-model-snapshot.concurrency.snapshotting-lock.timeout')
+        config('laravel-snap.concurrency.snapshotting-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
+        config('laravel-snap.concurrency.snapshotting-lock.timeout')
     );
     $lock->acquire();
 
@@ -253,8 +253,8 @@ test('concurrent snapshot rewinding is prevented', function () {
     $model = TestRootModel::query()->create();
 
     $lock = Cache::lock(
-        config('complete-model-snapshot.concurrency.rewinding-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
-        config('complete-model-snapshot.concurrency.rewinding-lock.timeout')
+        config('laravel-snap.concurrency.rewinding-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
+        config('laravel-snap.concurrency.rewinding-lock.timeout')
     );
     $lock->acquire();
 

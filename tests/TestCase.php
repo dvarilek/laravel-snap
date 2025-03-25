@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Tests;
+namespace Dvarilek\LaravelSnap\Tests;
 
-use Dvarilek\CompleteModelSnapshot\LaravelCompleteModelSnapshotServiceProvider;
+use Dvarilek\LaravelSnap\LaravelSnapServiceProvider;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
@@ -22,7 +22,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app): array
     {
         return [
-            LaravelCompleteModelSnapshotServiceProvider::class,
+            LaravelSnapServiceProvider::class,
         ];
     }
 

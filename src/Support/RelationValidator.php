@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Support;
+namespace Dvarilek\LaravelSnap\Support;
 
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidRelationException;
+use Dvarilek\LaravelSnap\Exceptions\InvalidRelationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;

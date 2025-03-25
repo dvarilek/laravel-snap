@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Models\Concerns;
+namespace Dvarilek\LaravelSnap\Models\Concerns;
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\Contracts\VirtualAttribute;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\Exceptions\InvalidSnapshotException;
-use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\Contracts\VirtualAttribute;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Exceptions\InvalidSnapshotException;
+use Dvarilek\LaravelSnap\Helpers\TransferObjectHelper;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\Services\Contracts\AttributeRestorerInterface;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\{SnapshotDefinition, RelationDefinition};
-use Dvarilek\CompleteModelSnapshot\Tests\Models\{TestRootModel, TestParent1Model, TestAnotherParent1Model, TestParent2Model};
-use Dvarilek\CompleteModelSnapshot\Services\SnapshotAttributeRestorer;
+use Dvarilek\LaravelSnap\Services\Contracts\AttributeRestorerInterface;
+use Dvarilek\LaravelSnap\ValueObjects\{SnapshotDefinition, RelationDefinition};
+use Dvarilek\LaravelSnap\Tests\Models\{TestRootModel, TestParent1Model, TestAnotherParent1Model, TestParent2Model};
+use Dvarilek\LaravelSnap\Services\SnapshotAttributeRestorer;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Support\Stringable;

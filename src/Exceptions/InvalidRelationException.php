@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Exceptions;
+namespace Dvarilek\LaravelSnap\Exceptions;
 
-use Dvarilek\CompleteModelSnapshot\Support\RelationValidator;
+use Dvarilek\LaravelSnap\Support\RelationValidator;
 use Illuminate\Database\Eloquent\Model;
 
 final class InvalidRelationException extends \Exception

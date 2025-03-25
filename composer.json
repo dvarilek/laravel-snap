@@ -1,5 +1,5 @@
 {
-    "name": "dvarilek/laravel-complete-model-snapshot",
+    "name": "dvarilek/laravel-snap",
     "description": "A Laravel package for capturing and persisting the state of Eloquent models along with their relationships.",
     "keywords": [
         "laravel",
@@ -11,12 +11,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Dvarilek\\CompleteModelSnapshot\\": "src"
+            "Dvarilek\\LaravelSnap\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dvarilek\\CompleteModelSnapshot\\Tests\\": "tests/"
+            "Dvarilek\\LaravelSnap\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -41,7 +41,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Dvarilek\\CompleteModelSnapshot\\LaravelCompleteModelSnapshotServiceProvider"
+                "Dvarilek\\LaravelSnap\\LaravelSnapServiceProvider"
             ]
         }
     },

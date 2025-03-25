@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
 use Illuminate\Contracts\Support\Arrayable;
-use Dvarilek\CompleteModelSnapshot\Helpers\TransferObjectHelper;
+use Dvarilek\LaravelSnap\Helpers\TransferObjectHelper;
 
 it('correctly initializes and serializes AttributeTransferObject', function () {
     $dto = new AttributeTransferObject(

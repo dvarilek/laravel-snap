@@ -1,6 +1,6 @@
 <?php
 
-namespace Dvarilek\CompleteModelSnapshot\Tests\Models;
+namespace Dvarilek\LaravelSnap\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\Exceptions;
+namespace Dvarilek\LaravelSnap\Exceptions;
 
-use Dvarilek\CompleteModelSnapshot\DTO\AttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\DTO\RelatedAttributeTransferObject;
-use Dvarilek\CompleteModelSnapshot\Models\Contracts\SnapshotContract;
+use Dvarilek\LaravelSnap\DTO\AttributeTransferObject;
+use Dvarilek\LaravelSnap\DTO\RelatedAttributeTransferObject;
+use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Illuminate\Database\Eloquent\Model;
 
 final class InvalidSnapshotException extends \InvalidArgumentException

@@ -1,9 +1,9 @@
 <?php
 
-namespace Dvarilek\CompleteModelSnapshot\Tests\Models;
+namespace Dvarilek\LaravelSnap\Tests\Models;
 
-use Dvarilek\CompleteModelSnapshot\Models\Concerns\Snapshotable;
-use Dvarilek\CompleteModelSnapshot\ValueObjects\SnapshotDefinition;
+use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
+use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

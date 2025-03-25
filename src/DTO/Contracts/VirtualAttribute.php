@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Dvarilek\CompleteModelSnapshot\DTO\Contracts;
+namespace Dvarilek\LaravelSnap\DTO\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
 
