@@ -1,6 +1,6 @@
 <?php
 
-// Configuration file for Laravel Snap package
+// Configuration for Laravel Snap package
 
 use Dvarilek\LaravelSnap\Models\Snapshot;
 
@@ -43,11 +43,10 @@ return [
     'timestamp-prefix' => 'origin_',
 
     /**
-     * Configure the name and timeout used for locks in snapshotting and rewinding operations.
+     * Configure the name and timeout used for snapshotting and rewinding operation cache locks.
      *
-     * Models using the Snapshotable trait will append their table name and primary key
-     * to the specified lock name.This makes sure that lock acquisition is done per model instance
-     * rather than per model class.
+     * Each model additionally suffixes its table and primary key to ensure lock acquisition does not
+     * interfere between different models.
      */
     'concurrency' => [
 

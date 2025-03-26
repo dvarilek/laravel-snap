@@ -4,18 +4,17 @@
 > This package is currently in early stages of active development and should not be used in production environments.
 
 ## Overview
-This Laravel package allows you to capture, persist and track Eloquent models and their related attributes over time. 
-This is achieved using Snapshots. A snapshot is essentially a copied version of a model's state (its attributes), 
-that is stored within a dedicated separate snapshot table. For more information see the **Internal Implementation** section.
+Laravel Snap is a robust and easily configurable package for versioning your application's Eloquent Models by capturing 
+their full context in a Snapshot - this even includes attributes from related Models.
 
-Any model attributes can be captured. What attributes get and don't get captured in the Snapshot is **fully configurable** 
-by the developer.
+Model versions are stored in Snapshots. A Snapshot is a copied state of a Model - state meaning its attributes alongside 
+important metadata like their casts. Obviously, since the attributes are copied, no synchronization is done on updates, 
+meaning the state gets truly persisted.
 
-A standout feature of this package is its ability to also capture specific attributes from related models. Rather than simply
-storing a foreign key reference, snapshots preserve the actual attribute values of related models inside of them, ensuring that 
-the full context of a record can be captured and persisted, making it particularly useful with storing sensitive records
-that need to comply with legislative/regulatory requirements and auditing purposes where an accurate historical representation is 
-essential.
+A Snapshot can not only store Model attributes from a single Model, but Laravel Snap even handles storing of related Model 
+attributes relative to the origin Model. Related attributes are stored directly in the Snapshot - no 'related' Snapshot 
+gets created and linked to. This means that the full context of a record gets captured and persisted in a single Snapshot. 
+(useful for legislative requirements and auditing purposes)
 
 ***
 ## Installation 
@@ -27,11 +26,17 @@ composer require dvarilek/laravel-snap
 ```bash
 php artisan laravel-snap:install
 ```
-***
-## Basic Usage & Configuration  
+Additionally, you can publish the config:
+```bash
+php artisan vendor:publish --tag=laravel-snap-config
+```
 
-Firstly, we need to make our Eloquent model snapshotable and configure what should and shouldn't get captured in our snapshot.
-The configuration happens through a SnapshotDefinition. Start by using the Snapshotable trait in your Model:
+***
+## Starting
+
+* Firstly, we need to use Snapshotable trait inside our Model.
+The 'getSnapshotDefinition' method specifies, what should and shouldn't get captured in a Snapshot.
+
 ```php
 use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
 use Dvarilek\LaravelSnap\ValueObjects\SnapshotDefinition;
@@ -45,8 +50,42 @@ class MyModel extends Model
         return SnapshotDefinition::make()
             ->captureAll();
     }
+    
+    // ...
 }
 ```
+
+> [!NOTE]\
+> To see all configuration options for SnapshotDefinition, see the [Snapshot Configuration](#snapshot-configuration) section. 
+
+* Then simply call the 'takeSnapshot' method on your Model:
+
+```php
+$firstSnapshot = $model->takeSnapshot();
+
+// Access captured Snapshot attribute directly
+$name = $firstSnapshot->name;
+$email = $firstSnapshot->email;
+
+$model->update([
+    'email' => 'different email'
+])
+
+$secondSnapshot = $model->takeSnapshot();
+
+$firstSnapshot->email === $secondSnapshot->email; // false
+$firstSnapshot->email === $model->email; // false
+$secondSnapshot->email === $model->email; // true
+```
+
+> [!NOTE]\
+> For more information and options, see the [Snapshots](#snapshots) section.
+
+***
+## Snapshot Configuration
+
+The configuration of what exactly gets and doesn't get captured in a Snapshot is done fluently through a 
+SnapshotDefinition.
 
 ### Capturing Model Attributes
 
@@ -56,7 +95,7 @@ SnapshotDefinition::make()
     ->captureAll();
 ```
 \
-Capture only the specified attributes from the model:
+Capture only specific attributes from the model:
 ```php
 SnapshotDefinition::make()
     ->capture([
@@ -75,7 +114,7 @@ SnapshotDefinition::make()
 ```
 
 \
-Prevent specified attributes from being included in the snapshot:
+Prevent specified attributes from being included in the Snapshot:
 ```php
 SnapshotDefinition::make()
     ->captureAll()
@@ -86,7 +125,7 @@ SnapshotDefinition::make()
 ```
 
 \
-By default, attribute casting (like dates, enums, arrays, collections) is preserved in the snapshot.
+By default, attribute casting (like dates, enums, arrays, collections) is preserved in the Snapshot.
 To store attributes without their original casting types, you can specifically disable this feature:
 ```php
 SnapshotDefinition::make()
@@ -102,17 +141,14 @@ SnapshotDefinition::make()
 ```
 > [!IMPORTANT]\
 > When timestamps are captured (not excluded), they are prefixed with 'origin_' to prevent conflicts with the
-> snapshot model's own timestamps. For example, the model's 'created_at' becomes 'origin_created_at' in the snapshot.
-
-You can customize the timestamp prefix ('origin_') by publishing and modifying the package's configuration file:
-```bash
-php artisan vendor:publish --tag=laravel-snap-config
-```
+> Snapshot's own timestamps. For example, the model's 'created_at' becomes 'origin_created_at' in the Snapshot.
+> The timestamp prefix ('origin_' by default) can be modified in the package's config file.
 
 ### Capturing Related Attributes
 
-Capturing attributes from related models stores them in the same snapshot with the attributes 
-being prefixed by their relation path relative to the main model. This is done to avoid potential naming conflicts.
+Capturing attributes from related models stores them in the same Snapshot. The captured attributes 
+are prefixed by their relation path relative to the main model. This is done to avoid potential naming 
+conflicts between attributes.
 
 To capture related attributes you need to provide a RelationDefinition(s):
 ```php
@@ -132,13 +168,13 @@ SnapshotDefinition::make()
         // ... Multiple RelationDefinitions can be specified     
     ]);
 
-// Captured attributes in snapshot
+// Captured attributes in Snapshot
 // branch_name
 // branch_address
 // supervisor_name
 ```
 > [!NOTE]\
-> RelationDefinition is a superset of SnapshotDefinition, meaning it has access to all of its methods, meaning methods
+> RelationDefinition is a superset of SnapshotDefinition, meaning it has access to all its methods, meaning methods
 > like captureAll(), exclude(), excludeTimestamps(), etc. are available.
 
 > [!IMPORTANT]\
@@ -146,8 +182,8 @@ SnapshotDefinition::make()
 
 ### Capturing Nested Related Attributes
 
-For deeply nested related attributes the same prefix rules apply. You can capture them
-by capturing them like this:
+You can capture deeply nested related attributes by capturing them like this:
+The same prefix rules apply.
 ```php
 use Dvarilek\LaravelSnap\ValueObjects\{SnapshotDefinition, RelationDefinition}
 
@@ -175,31 +211,32 @@ SnapshotDefinition::make()
 ```
 <br>
 
-## Taking Snapshots
+***
+## Snapshots
 
-A single model can have multiple snapshots. To create new snapshot call the takeSnapshot method on your Snapshotable model.
+### Working With Snapshots
 
+**Taking Snapshots** \
+After using the Snapshotable trait in your Model, you can take Snapshots like this:
 ```php
-use Dvarilek\LaravelSnap\Models\Snapshot;
-use Illuminate\Database\Eloquent\Model;
 
-/** @var Snapshot&Model $snapshot */
 $snapshot = $model->takeSnapshot();
 ```
 
-You can include extra attributes when taking a snapshot even whey they are not the actual model attributes.
+The 'takeSnapshot' method accepts an array of extra attributes that can be provided at runtime. These attributes are then stored in
+the created Snapshot:
 ```php
 
-/** @var Snapshot&Model $snapshot */
-$snapshot = $model->takeSnapshot([
+// Store the currently authenticated user that created the Snapshot 
+$snapshot = $model->takeSnapshot(extraAttributes: [
     'created_by' => auth()->id()
 ]);
 ```
 > [!TIP]
-> These additional attributes can bypass the SnapshotDefinition rules - meaning they can be captured even if excluded in the definition:
+> The extra attributes can even bypass SnapshotDefinition constraints.
 
-\
-For convenience, the Snapshotable trait adds two relationships for getting the latest and oldest snapshot out of the box. 
+**Retrieving**\
+For convenience, the Snapshotable trait adds two relationships for getting the latest and oldest Snapshots out of the box:
 ```php
   
 // Get the most recent snapshot
@@ -209,14 +246,8 @@ $latest = $model->latestSnapshot;
 $oldest = $model->oldestSnapshot;
 ```
 
-\
-***
-## Working With Snapshots
-The snapshot stores its captured attributes in a special JSON column structure. However, you are able to interact with them
-as if they were regular model attributes.
-
-**Retrieving** \
-Access captured attributes directly as model properties:
+The Snapshot stores its captured attributes in a special JSON column structure. However, you are able to interact with them
+directly as if they were regular model attributes with property access:
 ```php
 
 $snapshot = $model->takeSnapshot();
@@ -224,7 +255,12 @@ $snapshot = $model->takeSnapshot();
 // Access captured attributes directly
 $name = $snapshot->name;
 $email = $snapshot->email;
+$supervisorName = $snapshot->supervisor_name;
 ```
+
+> [!NOTE]\
+> For more information about how these attributes are stored, see the [Internal Implementation](#internal-implementation) section.
+
 <br>
 
 **Updating** \
@@ -242,32 +278,34 @@ $snapshot->save();
 ```
 <br>
 
-#### Querying
-Since snapshot attributes are stored in a json column, they can't be queried directly. They need to be queried in
+**Querying** \
+Because Snapshot attributes are stored in a JSON column, they can't be queried directly as they need to be queried in
 the JSON column. For more information about JSON querying see the [**Official Laravel Documentation**](https://laravel.com/docs/10.x/queries#json-where-clauses)
 
 ```php
 use Dvarilek\LaravelSnap\Models\Snapshot;
 
 // For captured attribute by the name 'custodian_name'
-Snapshot::query()->where('storage->custodian_name->value', $value);
+Snapshot::query()->where('storage->custodian_name->value', $custodianName);
 ```
-<br>
 
-***
-## Rewinding
-A model's state can be easily rewound to a previous snapshot. 
-Rewinding is done using the rewindTo method that accepts the specific snapshot and an optional parameter that 
-determines whether the rewinding should affect related models that have their attribute stored in the snapshot.
-
+### Rewinding
+A model's state can be easily restored from its previously taken Snapshot.
+Call the rewindTo method and provide the Snapshot you wish to rewind to:
 ```php
 $snapshot = $model->latestSnapshot;
 
 // Returns the same model with rewound attributes
-$model = $model->rewindTo($snapshot, shouldRestoreRelatedAttributes: true); // shouldRestoreRelatedAttributes is set to true by default
+$model = $model->rewindTo($snapshot, shouldRestoreRelatedAttributes: true); 
 ```
 
-The sync method is a convenient shortcut that sets the snapshot state to its origin. Instead of the code above you can do:
+> [!NOTE]\
+> You can specify if you want to also restore attributes that originate from related models.
+
+<br/>
+
+The sync method is a convenient shortcut that sets the Snapshot's state to its origin. 
+Instead of the code above you can by directly calling on Snapshot instance do:
 ```php
 $model = $model->latestSnapshot->sync();
 ```
@@ -275,10 +313,16 @@ $model = $model->latestSnapshot->sync();
 > [!NOTE]\
 > Currently, there is no way to restore only specific attributes using some RestorationDefinition equivalent to SnapshotDefinition
 
+### Race Conditions
+Concurrent snapshotting and rewinding operations by different users can lead to inconsistent behavior.
+Laravel Snap prevents these race conditions by using Laravel's atomic locks feature. Once a lock is acquired,
+it waits until the operation finishes before allowing other processes to proceed.
 
-***
-## Event Hooks
-While working with snapshots, you can hook into the snapshotting and rewinding processes.
+The cache lock names and timeouts can be configured inside the package's config file under 'concurrency'.
+
+
+### Event Hooks
+While working with snapshots, you can hook into the snapshotting and rewinding processes:
 
 ```php
 use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
@@ -292,6 +336,9 @@ class MyModel extends Model
     
     public static function booted(): void
     {
+        
+        // ...
+    
         static::snapshotting(function () {
             // Executes before snapshot creation
             // Return false to prevent the snapshot from being created
@@ -313,18 +360,17 @@ class MyModel extends Model
 }
 ```
 
-
 ***
 ## Advanced 
 
 ### Internal Implementation
-#### Storage
-Snapshots are stored in a dedicated table (model_snapshots) and connected to their original models through a polymorphic relationship. 
-Their attributes are kept in a dedicated JSON 'storage' column with a structured format that preserves all of their necessary metadata.
-
+**Storage**\
+Snapshots are stored in a dedicated table (model_snapshots) and connected to their original models through a polymorphic 
+relationship. The captured attributes are kept in a special JSON 'storage' column with in a structured format, 
+preserving all of their necessary metadata.
 <br>
 
-* **Base Model Attribute Storage Format**
+* **Base Model Attribute Storage Format**\
 Regular model attributes are stored in the format below and represented using **AttributeTransferObject** DTO throughout the package.
 ```JSON
 {
@@ -340,7 +386,7 @@ Regular model attributes are stored in the format below and represented using **
   }
 }
 ```
-* **Related Model Attribute Storage Format**
+* **Related Model Attribute Storage Format** \
 Related model attributes are kept in the format below and represented using **RelatedAttributeTransferObject** DTO throughout the package.
 ```JSON
 {
@@ -359,22 +405,23 @@ Related model attributes are kept in the format below and represented using **Re
 }
 ```
 > [!NOTE]\
-> relationPath is an array of ordered relationship names relative to the base model. This is kept for tracking purposes.
+> relationPath is an array of ordered relationship names relative to the base model.
 
 <br>
 
-#### Data Manipulation
-Working with JSON-encoded data directly on the snapshot model is possible by hooking into the model's event handling.
+**Data Manipulation** \
+Working with JSON-encoded data directly through the Snapshot model is possible by hooking into the Model's event handling.
 
-Attributes are decoded from the storage column and set as the model's attributes, 
-subsequent updates to these attributes are persisted by encoding them back into the storage column's JSON.
-The internal implementation of attribute encoding and decoding is partially derived from [**VirtualColumn Laravel package**](
+Attributes are decoded from the storage column and set as the model's attributes, subsequent updates to these attributes
+are then persisted by encoding them back into the storage column's JSON.
+The internal implementation of attributes encoding and decoding is partially derived from [**VirtualColumn Laravel package**](
 https://github.com/archtechx/virtualcolumn)
 
 ### Advanced Usage
-#### DTO Usage
-Internally, all snapshot attribute sare set using special DTO's. These DTO's can also be used to set attributes
-with extra metadata e.g. setting/changing casts etc. 
+**DTO Usage**\
+Internally, all Snapshot attributes are set using the mentioned special DTO's. This is useful to know when you want 
+to update Snapshots by appending them with extra attributes or by modifying their existing attributes if you for example 
+wish to change their casts.
 
 ```php
 use Dvarilek\LaravelSnap\DTO\{AttributeTransferObject, RelatedAttributeTransferObject}
@@ -383,40 +430,44 @@ use Illuminate\Database\Eloquent\Casts\{AsStringable, AsCollection};
 $snapshot->update([
     // Base model attribute with custom casting
     'name' => new AttributeTransferObject(
-        'attribute' => 'name',
-        'value' => 'A different name',
-        'cast' => AsStringable::class
+        attribute: 'name',
+        value: 'some different value',
+        cast: AsStringable::class
     ),
     
     // Related model attribute with collection casting
     'contract_files' => new RelatedAttributeTransferObject(
-        'attribute' => 'files',
-        'value' => ['path/to/file1'. 'path/to/file2'],
-        'cast' => AsCollection::class,
-        'relationPath' => ['department']
+        attribute: 'files',
+        value: ['path/to/file1'. 'path/to/file2'],
+        cast: AsCollection::class,
+        relationPath:  => ['department']
     )
 ]);
-
-// Create a snapshot with extra attribute with a specific cast
-$model->takeSnapshot([
-    'name' => new AttributeTransferObject(
-        'attribute' => 'name',
-        'value' => 'David',
-        'cast' => AsStringable::class
-    ),
-]);
-
 ```
 
+Additionally, extra attribute information can also be provided when creating a Snapshot with extra attributes.
+
+```php
+// Create a Snapshot with invoices as an extra attribute
+$snapshot = $model->takeSnapshot(extraAttributes: [
+    'invoices' => new AttributeTransferObject(
+        attribute: 'invoices',
+        value: ['path/to/file1'. 'path/to/file2'],
+        cast: 'array'
+    ),
+]);
+```
 ***
+
+
 ## Testing
 
 ```bash
 composer test && composer stan
 ```
+***
 
 ## Changelog
 Please refer to [Package Releases](https://github.com/dvarilek/laravel-snap/releases) for more information about changes.
-
 ## License
 This package is under the MIT License. Please refer to [License File](LICENSE.md) for more information
