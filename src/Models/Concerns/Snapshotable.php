@@ -110,7 +110,7 @@ trait Snapshotable
             /** @var AttributeRestorerInterface $restorer */
             $restorer = app(AttributeRestorerInterface::class);
 
-            $model = $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
+            $model = $this->getConnection()->transaction(fn () => $restorer->restoreFromSnapshot($this, $snapshot, $shouldRestoreRelatedAttributes));
 
             $this->fireModelEvent('reverted');
 

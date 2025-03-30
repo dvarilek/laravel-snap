@@ -17,7 +17,7 @@ class SnapshotAttributeRestorer implements AttributeRestorerInterface
     /**
      * @inheritDoc
      */
-    public function rewindTo(Model $model, SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): Model
+    public function restoreFromSnapshot(Model $model, SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): Model
     {
         [$modelAttributes, $relatedAttributes] = static::divideSnapshotAttributes($snapshot);
 

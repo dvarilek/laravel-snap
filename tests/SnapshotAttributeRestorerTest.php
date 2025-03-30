@@ -40,7 +40,7 @@ test('attribute restorer can restore model attributes by reverting to a specific
     ]);
 
     $secondSnapshot = $model->refresh()->takeSnapshot();
-    $model = $restorer->rewindTo($model, $firstSnapshot);
+    $model = $restorer->restoreFromSnapshot($model, $firstSnapshot);
 
     expect($model->refresh())
         ->toBeInstanceOf(TestRootModel::class)
@@ -48,7 +48,7 @@ test('attribute restorer can restore model attributes by reverting to a specific
         ->attribute2->toBe($firstSnapshotValue2)
         ->attribute3->toBe($firstSnapshotValue3);
 
-    $model = $restorer->rewindTo($model, $secondSnapshot);
+    $model = $restorer->restoreFromSnapshot($model, $secondSnapshot);
 
     expect($model->refresh())
         ->toBeInstanceOf(TestRootModel::class)
@@ -96,7 +96,7 @@ test('attribute restorer can restore castable model attributes by reverting to a
 
     $secondSnapshot = $mainModel->takeSnapshot();
 
-    $mainModel = $restorer->rewindTo($mainModel, $firstSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $firstSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)
@@ -105,7 +105,7 @@ test('attribute restorer can restore castable model attributes by reverting to a
         ->attribute2->toBe($firstSnapshotValue2)
         ->attribute3->toBe($firstSnapshotValue3);
 
-    $mainModel = $restorer->rewindTo($mainModel, $secondSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $secondSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)
@@ -175,7 +175,7 @@ test('attribute restorer can restore related model attributes by reverting to a 
 
     $secondSnapshot = $mainModel->refresh()->takeSnapshot();
 
-    $mainModel = $restorer->rewindTo($mainModel, $firstSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $firstSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)
@@ -186,7 +186,7 @@ test('attribute restorer can restore related model attributes by reverting to a 
         ->attribute1->toBe($firstSnapshotAnotherParentValue1)
         ->attribute2->toBe($firstSnapshotAnotherParentValue2);
 
-    $mainModel = $restorer->rewindTo($mainModel, $secondSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $secondSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)
@@ -260,7 +260,7 @@ test('attribute restorer can restore nested related model attributes by revertin
 
     $secondSnapshot = $mainModel->refresh()->takeSnapshot();
 
-    $mainModel = $restorer->rewindTo($mainModel, $firstSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $firstSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)
@@ -271,7 +271,7 @@ test('attribute restorer can restore nested related model attributes by revertin
         ->attribute1->toBe($firstSnapshotParentParentValue1)
         ->attribute2->toBe($firstSnapshotParentParentValue2);
 
-    $mainModel = $restorer->rewindTo($mainModel, $secondSnapshot);
+    $mainModel = $restorer->restoreFromSnapshot($mainModel, $secondSnapshot);
 
     expect($mainModel)
         ->toBeInstanceOf(TestRootModel::class)

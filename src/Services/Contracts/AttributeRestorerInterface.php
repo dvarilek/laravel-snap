@@ -25,7 +25,7 @@ interface AttributeRestorerInterface
      *
      * @return Model
      */
-    public function rewindTo(Model $model, SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = false): Model;
+    public function restoreFromSnapshot(Model $model, SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = false): Model;
 
     /**
      * Restore attributes of a specific model.
