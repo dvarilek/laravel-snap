@@ -75,6 +75,6 @@ class Snapshot extends Model implements SnapshotContract
         $origin = $this->origin()->get()->first();
 
         /** @phpstan-ignore method.notFound */
-        return $origin->rewindTo($this, $shouldRestoreRelatedAttributes);
+        return $origin->revertTo($this, $shouldRestoreRelatedAttributes);
     }
 }

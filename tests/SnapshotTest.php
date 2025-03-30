@@ -151,39 +151,39 @@ test('takeSnapshot operation is canceled when false is returned from snapshottin
         ->toHaveCount(0);
 });
 
-test('rewindTo method dispatches events during the restoration process', function () {
+test('revertTo method dispatches events during the restoration process', function () {
     Event::fake();
 
     $model = TestRootModel::query()->create();
 
     $snapshot = $model->takeSnapshot();
-    $model = $model->rewindTo($snapshot);
+    $model = $model->revertTo($snapshot);
 
-    Event::assertDispatched('eloquent.rewinding: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+    Event::assertDispatched('eloquent.reverting: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
         return $payloadModel->is($model);
     });
 
-    Event::assertDispatched('eloquent.rewound: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
+    Event::assertDispatched('eloquent.reverted: ' . $model::class, function (string $eventName, TestRootModel $payloadModel) use ($model) {
         return $payloadModel->is($model);
     });
 });
 
-test('rewindTo method accepts only valid snapshots', function () {
+test('revertTo method accepts only valid snapshots', function () {
 
     $model = TestRootModel::query()->create();
     $differentModel = TestRootModel::query()->create();
 
     $snapshot = $model->takeSnapshot();
 
-    expect(fn () => $differentModel->rewindTo($snapshot))
+    expect(fn () => $differentModel->revertTo($snapshot))
         ->toThrow(InvalidSnapshotException::class);
 });
 
-test('rewindTo operation is canceled when false is returned from rewinding listener', function () {
+test('revertTo operation is canceled when false is returned from reverting listener', function () {
     $class = new class extends TestRootModel {
         public static function booted(): void
         {
-            static::rewinding(fn () => false);
+            static::reverting(fn () => false);
         }
     };
 
@@ -197,7 +197,7 @@ test('rewindTo operation is canceled when false is returned from rewinding liste
     ]);
     $model->takeSnapshot();
 
-    $result = $model->rewindTo($firstSnapshot);
+    $result = $model->revertTo($firstSnapshot);
 
     expect($result)
         ->toBeNull()
@@ -248,13 +248,13 @@ test('concurrent snapshot creation is prevented', function () {
     }
 });
 
-test('concurrent snapshot rewinding is prevented', function () {
+test('concurrent snapshot reverting is prevented', function () {
     /** @var TestRootModel $model */
     $model = TestRootModel::query()->create();
 
     $lock = Cache::lock(
-        config('laravel-snap.concurrency.rewinding-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
-        config('laravel-snap.concurrency.rewinding-lock.timeout')
+        config('laravel-snap.concurrency.reverting-lock.name') . "_" . $model->getTable() . "_" . $model->getKey(),
+        config('laravel-snap.concurrency.reverting-lock.timeout')
     );
     $lock->acquire();
 
@@ -262,7 +262,7 @@ test('concurrent snapshot rewinding is prevented', function () {
     $firstSnapshot = $model->takeSnapshot();
 
     try {
-        $result = $model->rewindTo($firstSnapshot);
+        $result = $model->revertTo($firstSnapshot);
 
         expect($result)->toBeFalse();
     } finally {

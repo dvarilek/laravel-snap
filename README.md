@@ -289,14 +289,14 @@ use Dvarilek\LaravelSnap\Models\Snapshot;
 Snapshot::query()->where('storage->custodian_name->value', $custodianName);
 ```
 
-### Rewinding
+### Reverting
 A model's state can be easily restored from its previously taken Snapshot.
-Call the rewindTo method and provide the Snapshot you wish to rewind to:
+Call the revertTo method and provide the Snapshot you wish to rewind to:
 ```php
 $snapshot = $model->latestSnapshot;
 
-// Returns the same model with rewound attributes
-$model = $model->rewindTo($snapshot, shouldRestoreRelatedAttributes: true); 
+// Returns the same model with reverted attributes
+$model = $model->revertTo($snapshot, shouldRestoreRelatedAttributes: true); 
 ```
 
 > [!NOTE]\
@@ -314,7 +314,7 @@ $model = $model->latestSnapshot->sync();
 > Currently, there is no way to restore only specific attributes using some RestorationDefinition equivalent to SnapshotDefinition
 
 ### Race Conditions
-Concurrent snapshotting and rewinding operations by different users can lead to inconsistent behavior.
+Concurrent snapshotting and reverting operations by different users can lead to inconsistent behavior.
 Laravel Snap prevents these race conditions by using Laravel's atomic locks feature. Once a lock is acquired,
 it waits until the operation finishes before allowing other processes to proceed.
 
@@ -322,7 +322,7 @@ The cache lock names and timeouts can be configured inside the package's config 
 
 
 ### Event Hooks
-While working with snapshots, you can hook into the snapshotting and rewinding processes:
+While working with snapshots, you can hook into the snapshotting and reverting processes:
 
 ```php
 use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
@@ -348,13 +348,13 @@ class MyModel extends Model
             // Executes after successful snapshot creation        
         });
         
-        static::rewinding(function () {
-            // Executes before model state is rewound
-            // Return false to cancel the rewinding operation
+        static::reverting(function () {
+            // Executes before model state is reverted
+            // Return false to cancel the reverting operation
         });
         
-        static::rewound(function () {
-            // Executes after model state has been successfully rewound
+        static::reverted(function () {
+            // Executes after model state has been successfully reverted
         });
     }
 }

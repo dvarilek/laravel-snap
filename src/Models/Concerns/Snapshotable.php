@@ -82,28 +82,28 @@ trait Snapshotable
     }
 
     /**
-     * Rewind the model to a concrete snapshot instance.
+     * Revert the Model's state to a previously taken Snapshot.
      *
-     * @param  Snapshot $snapshot
+     * @param  SnapshotContract&Model $snapshot
      * @param  bool $shouldRestoreRelatedAttributes
      *
      * @return static|null|false
-     *  *   If successful, the current instance with updated state gets returned.
-     *  *   If the rewinding Eloquent event gets cancelled, null gets returned.
+     *  *   If successful, the current Model instance with updated state gets returned.
+     *  *   If the reverting Eloquent event gets cancelled, null gets returned.
      *  *   If another process has already acquired the lock, false gets returned.
      *
      * @throws InvalidSnapshotException
      */
-    public function rewindTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null|false
+    public function revertTo(SnapshotContract&Model $snapshot, bool $shouldRestoreRelatedAttributes = true): static|null|false
     {
         SnapshotValidator::assertValid($snapshot, $this);
 
-        $lockName = $this->suffixLockName(config('laravel-snap.concurrency.rewinding-lock.name'));
-        $lockTimeout = config('laravel-snap.concurrency.rewinding-lock.timeout');
+        $lockName = $this->suffixLockName(config('laravel-snap.concurrency.reverting-lock.name'));
+        $lockTimeout = config('laravel-snap.concurrency.reverting-lock.timeout');
 
         /** @var static|null|false */
         return Cache::lock($lockName, $lockTimeout)->get(function () use ($snapshot, $shouldRestoreRelatedAttributes) {
-            if ($this->fireModelEvent('rewinding') === false) {
+            if ($this->fireModelEvent('reverting') === false) {
                 return null;
             }
 
@@ -112,7 +112,7 @@ trait Snapshotable
 
             $model = $this->getConnection()->transaction(fn () => $restorer->rewindTo($this, $snapshot, $shouldRestoreRelatedAttributes));
 
-            $this->fireModelEvent('rewound');
+            $this->fireModelEvent('reverted');
 
             return $model;
         });
@@ -138,8 +138,8 @@ trait Snapshotable
         $this->observables = [
             ...$this->observables,
             ...[
-                'rewinding',
-                'rewound',
+                'reverting',
+                'reverted',
                 'snapshotting',
                 'snapshot'
             ]
@@ -147,27 +147,27 @@ trait Snapshotable
     }
 
     /**
-     * Register a custom rewinding model event with the dispatcher.
+     * Register a custom reverting model event with the dispatcher.
      *
      * @param  QueuedClosure|Closure|string|array  $callback
      *
      * @return void
      */
-    public static function rewinding(QueuedClosure|Closure|string|array $callback): void
+    public static function reverting(QueuedClosure|Closure|string|array $callback): void
     {
-        static::registerModelEvent('rewinding', $callback);
+        static::registerModelEvent('reverting', $callback);
     }
 
     /**
-     * Register a custom rewound model event with the dispatcher.
+     * Register a custom reverted model event with the dispatcher.
      *
      * @param  QueuedClosure|Closure|string|array  $callback
      *
      * @return void
      */
-    public static function rewound(QueuedClosure|Closure|string|array $callback): void
+    public static function reverted(QueuedClosure|Closure|string|array $callback): void
     {
-        static::registerModelEvent('rewound', $callback);
+        static::registerModelEvent('reverted', $callback);
     }
 
     /**

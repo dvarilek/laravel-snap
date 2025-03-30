@@ -43,7 +43,7 @@ return [
     'timestamp-prefix' => 'origin_',
 
     /**
-     * Configure the name and timeout used for snapshotting and rewinding operation cache locks.
+     * Configure the name and timeout used for snapshotting and reverting operation cache locks.
      *
      * Each model additionally suffixes its table and primary key to ensure lock acquisition does not
      * interfere between different models.
@@ -58,9 +58,9 @@ return [
 
         ],
 
-        'rewinding-lock' => [
+        'reverting-lock' => [
 
-            'name' => 'rewinding_atomic_lock',
+            'name' => 'reverting_atomic_lock',
 
             'timeout' => 10
 

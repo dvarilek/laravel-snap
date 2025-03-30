@@ -16,7 +16,7 @@ test('default attribute restorer is an instance of SnapshotAttributeRestorer', f
      expect($restorer)->toBeInstanceOf(SnapshotAttributeRestorer::class);
 });
 
-test('attribute restorer can restore model attributes by rewinding to a specific snapshot', function () {
+test('attribute restorer can restore model attributes by reverting to a specific snapshot', function () {
     $restorer = app(AttributeRestorerInterface::class);
 
     $firstSnapshotValue1 = "first1";
@@ -57,7 +57,7 @@ test('attribute restorer can restore model attributes by rewinding to a specific
         ->attribute3->toBe($firstSnapshotValue3);
 });
 
-test('attribute restorer can restore castable model attributes by rewinding to a specific snapshot', function () {
+test('attribute restorer can restore castable model attributes by reverting to a specific snapshot', function () {
     $restorer = app(AttributeRestorerInterface::class);
 
     $firstSnapshotValue1 = Str::of('firstSnapshot1');
@@ -115,7 +115,7 @@ test('attribute restorer can restore castable model attributes by rewinding to a
         ->attribute3->toBe($secondSnapshotValue3);
 });
 
-test('attribute restorer can restore related model attributes by rewinding to a specific snapshot', function () {
+test('attribute restorer can restore related model attributes by reverting to a specific snapshot', function () {
     $restorer = app(AttributeRestorerInterface::class);
 
     $firstSnapshotParentValue1 = 'firstSnapshotParent1';
@@ -198,7 +198,7 @@ test('attribute restorer can restore related model attributes by rewinding to a 
         ->attribute2->toBe($firstSnapshotAnotherParentValue2);
 });
 
-test('attribute restorer can restore nested related model attributes by rewinding to a specific snapshot', function () {
+test('attribute restorer can restore nested related model attributes by reverting to a specific snapshot', function () {
     $restorer = app(AttributeRestorerInterface::class);
 
     $firstSnapshotParentValue1 = 'firstSnapshotParent1';
