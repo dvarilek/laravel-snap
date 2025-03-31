@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Dvarilek\LaravelSnap\Models\Contracts;
 
-use Dvarilek\LaravelSnap\Models\Concerns\Snapshotable;
 use Dvarilek\LaravelSnap\Models\Snapshot;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,11 +20,25 @@ interface SnapshotContract
     public static function getStorageColumn(): string;
 
     /**
+     * Column that holds the Snapshot's version.
+     *
+     * @return string
+     */
+    public static function getVersionColumn(): string;
+
+    /**
      * Attributes that should not be encoded into the storage column.
      *
      * @return list<string>
      */
     public static function getNativeAttributes(): array;
+
+    /**
+     * Return the Snapshot's version.
+     *
+     * @return ?int
+     */
+    public function getVersion(): ?int;
 
     /**
      * Get the snapshots raw attributes without encoding and decoding.

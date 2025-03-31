@@ -17,7 +17,7 @@ final class SnapshotValidator
      *
      * @return void
      */
-    public static function assertValid(SnapshotContract&Model $snapshot, Model $originModelCandidate): void
+    public static function assertIsRelatedToModel(SnapshotContract&Model $snapshot, Model $originModelCandidate): void
     {
         $morphTypeColumn = config('laravel-snap.snapshot-model.morph-type');
         $morphKeyColumn = config('laravel-snap.snapshot-model.morph-id');

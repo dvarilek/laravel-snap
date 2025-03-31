@@ -289,29 +289,72 @@ use Dvarilek\LaravelSnap\Models\Snapshot;
 Snapshot::query()->where('storage->custodian_name->value', $custodianName);
 ```
 
-### Reverting
-A model's state can be easily restored from its previously taken Snapshot.
-Call the revertTo method and provide the Snapshot you wish to rewind to:
+### Reverting & Versioning
+**Basic Reverting**\
+Reverting allows you to restore a Model's state to one of its previous snapshots:
+
 ```php
+// Get the most recent snapshot
 $snapshot = $model->latestSnapshot;
 
-// Returns the same model with reverted attributes
-$model = $model->revertTo($snapshot, shouldRestoreRelatedAttributes: true); 
+// Revert the model to that snapshot
+$model = $model->revertTo($snapshot);
 ```
 
-> [!NOTE]\
-> You can specify if you want to also restore attributes that originate from related models.
-
-<br/>
-
-The sync method is a convenient shortcut that sets the Snapshot's state to its origin. 
-Instead of the code above you can by directly calling on Snapshot instance do:
+The sync method on Snapshot model is a convenient shortcut to synchronize the Snapshot's state with its origin model.
+In other words, the code above can be replaced with this:
 ```php
 $model = $model->latestSnapshot->sync();
 ```
 
-> [!NOTE]\
-> Currently, there is no way to restore only specific attributes using some RestorationDefinition equivalent to SnapshotDefinition
+Currently, there is no way to configure what exactly gets and doesn't get reverted from a Snapshot like there is for 
+taking Snapshots with SnapshotDefinition. However, you can optionally configure if related model attributes should be 
+also restored from the Snapshot.
+```php
+// Revert the model and attributes of related models from the Snapshot (true by default)
+$model = $model->revertTo($snapshot, shouldRestoreRelatedAttributes: true);
+```
+
+**Versioning**\
+To enable full versioning capabilities, your Snapshotable model can optionally include a column that tracks 
+the model's current version. This column is optional but required for version-based operations like 'rewind' 
+and 'forward'. 
+
+Once versioning is enabled, you can navigate through the Model's history by steps.
+The 'rewind' method allows you to move backward through your model's history by a specified number of steps:
+```php
+// Rewind the model by one step backwards (default)
+$model->rewind();
+
+// Rewind the model by three steps backwards
+$model->rewind(3);
+```
+
+Similar to 'rewind', the 'forward' method allows you to move forward through your model's history:
+```php
+// Move forward by one step (default)
+$model->forward();
+
+// Move forward by two steps
+$model->forward(2);
+```
+
+Both 'forward' and 'rewind' methods call the 'revertTo' method internally and accept the following
+optional arguments:
+```php
+// Default values: 
+$model->rewind(shouldDefaultToNearest: false, shouldRestoreRelatedAttributes: true);
+
+$model->forward(shouldDefaultToNearest: false, shouldRestoreRelatedAttributes: true);
+```
+* **shouldDefaultToNearest**:\
+  When set to true, this allows you to revert to the closest snapshot in the direction given
+  by the operation type if no exact match is found. 
+  For example, if you're rewinding 3 steps but only snapshots for steps 2 and 4 exist, it will use the snapshot at step 2 
+  (the nearest available in the rewind direction).
+* **shouldRestoreRelatedAttributes**:\ 
+  When set to true, the operation will also restore attributes of related models - same as with 'revertTo' method.
+
 
 ### Race Conditions
 Concurrent snapshotting and reverting operations by different users can lead to inconsistent behavior.
@@ -359,6 +402,9 @@ class MyModel extends Model
     }
 }
 ```
+
+> [!IMPORTANT]\
+> Both 'rewind' and 'forward' methods dispatch the 'reverting' and 'reverted' events.
 
 ***
 ## Advanced 

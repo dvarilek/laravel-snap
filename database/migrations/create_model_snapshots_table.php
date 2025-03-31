@@ -12,6 +12,7 @@ return new class extends Migration
              $table->id();
              $table->morphs('origin');
              $table->json('storage')->nullable()->default(null);
+             $table->unsignedBigInteger('version');
              $table->timestamps();
         });
     }

@@ -41,7 +41,8 @@ class LaravelSnapServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * @return class-string<Model>
+     * @return class-string<SnapshotContract&Model>
+     *
      * @throws InvalidConfigurationException
      */
     public static function determineSnapshotModel(): string

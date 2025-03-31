@@ -54,4 +54,16 @@ final class InvalidSnapshotException extends \InvalidArgumentException
             RelatedAttributeTransferObject::class
         ));
     }
+
+    /**
+     * @param  class-string<Model> $model
+     *
+     * @return self
+     */
+    public static function snapshotNotFound(string $model): self
+    {
+        return new self(sprintf("Snapshot of model '%s' not found",
+            $model,
+        ));
+    }
 }
