@@ -46,8 +46,9 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/pest",
-        "stan": "vendor/bin/phpstan analyse src --level=6"
+        "test": "vendor/bin/pest --min=96",
+        "stan": "vendor/bin/phpstan analyse src --level=6",
+        "test-coverage": "vendor/bin/pest --coverage --min=96"
     },
     "minimum-stability": "stable",
     "config": {
