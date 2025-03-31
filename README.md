@@ -1,5 +1,9 @@
 # Laravel Snap
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/dvarilek/laravel-snap.svg?style=flat-square)](https://packagist.org/packages/dvarilek/laravel-snap)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/dvarilek/laravel-snap/tests.yml?branch=main&label=Tests)](https://github.com/dvarilek/laravel-snap/actions/workflows/tests.yml)
+[![License](https://img.shields.io/github/license/dvarilek/laravel-snap)](https://github.com/dvarilek/laravel-snap/LICENSE.mf)
+
 > [!CAUTION]
 > This package is currently in early stages of active development and should not be used in production environments.
 
@@ -32,7 +36,7 @@ php artisan vendor:publish --tag=laravel-snap-config
 ```
 
 ***
-## Starting
+## Getting Started
 
 * Firstly, we need to use Snapshotable trait inside our Model.
 The 'getSnapshotDefinition' method specifies, what should and shouldn't get captured in a Snapshot.
