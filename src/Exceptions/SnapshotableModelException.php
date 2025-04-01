@@ -16,7 +16,7 @@ final class SnapshotableModelException extends \Exception
      */
     public static function missingCurrentVersionColumn(string $model): self
     {
-        return new self(sprintf("Reverting to a Snapshot by a specific number of steps on model '%s' requires having a 'current version column' configured on that model",
+        return new self(sprintf("Versioning a Model '%s' requires having a current version column configured on that model",
             $model
         ));
     }
