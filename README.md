@@ -520,7 +520,7 @@ $snapshot = $model->takeSnapshot(extraAttributes: [
 ## Testing
 
 ```bash
-composer test && composer stan
+composer test-coverage && composer stan
 ```
 ***
 
