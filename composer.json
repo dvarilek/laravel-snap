@@ -7,6 +7,7 @@
         "eloquent",
         "relationship"
     ],
+    "version": "0.3.1",
     "type": "library",
     "license": "MIT",
     "autoload": {
