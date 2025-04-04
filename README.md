@@ -29,7 +29,7 @@ php artisan laravel-snap:install
 ```
 Additionally, you can publish the config:
 ```bash
-php artisan vendor:publish --tag=laravel-snap-config
+php artisan vendor:publish --tag=snap-config
 ```
 
 ***
@@ -323,7 +323,7 @@ and 'forward'.
 
 If you don't want to manually create and migrate the migration, you can do so by running:
 ```bash
-php artisan laravel-snap:make-versionable --model="App\Models\YourModel"
+php artisan laravel-snap:make-versionable "App\Models\YourModel"
 ```
 The command automatically generates a migration for your model and, if confirmed, migrates it.
 
