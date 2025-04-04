@@ -97,10 +97,9 @@ describe('Validation', function () {
         $this->artisan('laravel-snap:make-versionable')
             ->expectsOutput("Invalid model provided")
             ->expectsOutput("Finding possible models...")
-            ->expectsChoice("Please select a model: ", [
+            ->expectsChoice("Please select a model: ",
+                TestPendingVersionableModel::class, [
                 TestPendingVersionableModel::class
-            ], [
-                TestPendingVersionableModel::class,
             ])
             ->expectsQuestion("Do you wish to run the migration?", false)
             ->expectsOutput("Success!")

@@ -85,7 +85,7 @@ class AddCurrentVersionColumnCommand extends Command
         return $this->choice(
             'Please select a model: ',
             $suitableModels->toArray(),
-        )[0];
+        );
     }
 
     /**
