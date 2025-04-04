@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+
+return new class extends Migration
+{
+
+    public function up(): void
+    {
+        Schema::table("SubstituteTable", function (Blueprint $table) {
+            $table->unsignedInteger("SubstituteCurrentVersionColumn")->nullable()->default(null);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table("SubstituteTable", function (Blueprint $table) {
+            $table->dropColumn("SubstituteCurrentVersionColumn");
+        });
+    }
+};

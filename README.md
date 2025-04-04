@@ -322,7 +322,17 @@ $model = $model->revertTo($snapshot, shouldRestoreRelatedAttributes: true);
 **Versioning**\
 To enable full versioning capabilities, your Snapshotable model can optionally include a column that tracks 
 the model's current version. This column is optional but required for version-based operations like 'rewind' 
-and 'forward'. 
+and 'forward'.
+
+If you don't want to manually create and migrate the migration, you can do so by running:
+```bash
+php artisan laravel-snap:make-versionable --model="App\Models\YourModel"
+```
+The command automatically generates a migration for your model and, if confirmed, migrates it.
+
+> [!NOTE]\
+> If you run this command without specifying a model, or if the specified model is invalid, the command
+> will attempt to look for valid models and prompt you for selection.
 
 Once versioning is enabled, you can navigate through the Model's history by steps.
 The 'rewind' method allows you to move backward through your model's history by a specified number of steps:

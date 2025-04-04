@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dvarilek\LaravelSnap;
 
+use Dvarilek\LaravelSnap\Commands\AddCurrentVersionColumnCommand;
 use Dvarilek\LaravelSnap\Exceptions\InvalidConfigurationException;
 use Dvarilek\LaravelSnap\Models\Contracts\SnapshotContract;
 use Dvarilek\LaravelSnap\Models\Snapshot;
@@ -31,6 +32,7 @@ class LaravelSnapServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-snap')
             ->hasConfigFile('laravel-snap')
+            ->hasCommand(AddCurrentVersionColumnCommand::class)
             ->discoversMigrations()
             ->hasInstallCommand(fn (InstallCommand $command) => $command
                 ->setName('laravel-snap:install')
