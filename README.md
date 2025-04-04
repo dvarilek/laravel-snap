@@ -4,9 +4,6 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/dvarilek/laravel-snap/tests.yml?branch=main&label=Tests)](https://github.com/dvarilek/laravel-snap/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/dvarilek/laravel-snap)](https://github.com/dvarilek/laravel-snap/LICENSE.mf)
 
-> [!CAUTION]
-> This package is currently in early stages of active development and should not be used in production environments.
-
 ## Overview
 Laravel Snap is a robust and easily configurable package for versioning your application's Eloquent Models by capturing 
 their full context in a Snapshot - this even includes attributes from related Models.
